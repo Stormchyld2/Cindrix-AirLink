@@ -136,9 +136,10 @@ Entry points: Send tab (QR icon), Receive/Home tab (primary "Pair a device" butt
   inject transfers**: AirLink↔AirLink traffic is mutual-TLS and the joiner pins the host's fingerprint (from the QR).
   Treat the QR as sensitive anyway; show it only to the person you are pairing with.
 - The Wi-Fi Direct passphrase is stored in app-private `SharedPreferences` and never leaves the device except in the QR.
-- The signing key in `signing/` was committed while the repo was private and has been visible while it was public.
-  **Do not ship to other people with it.** Create a new key, store it as the repository secrets
-  `ANDROID_KEYSTORE_BASE64` / `ANDROID_KEY_PASSWORD`, and delete `signing/` from the tree. See `signing/README.md`.
+- Android signing: the old key that lived in `signing/` was exposed while the repo was public, so it was **retired and
+  removed**. The real release key is a new one stored only in the repository secrets `ANDROID_KEYSTORE_BASE64` and
+  `ANDROID_KEY_PASSWORD` (alias `airlink`), plus an offline backup kept by the owner. Never commit a key to the repo.
+  Until those secrets exist, builds use a throwaway key (uninstall the old app before each update).
 - The app contains no update checks, analytics, or calls to LocalSend/Cindrix servers. Web share is plain http by
   default (browsers will not accept our self-signed certificate); keep it to trusted networks.
 
@@ -164,8 +165,8 @@ Entry points: Send tab (QR icon), Receive/Home tab (primary "Pair a device" butt
   Artifacts: Windows = one zip with the app files at its root; Android = the arm64 APK (single ABI, to stay within
   the runner's disk space).
 - The Android build frees runner disk first and builds `android-arm64` only.
-- Android signing: secrets if set → committed key only if the repo is private → throwaway key (then each build has a
-  different signature, so uninstall before updating).
+- Android signing: repository secrets if set → throwaway key (then each build has a different signature, so uninstall
+  before updating). The old committed-key option is still in the workflow but `signing/` no longer exists.
 - Pushing to `main` alone does not build anything.
 - Known upstream leftovers: the Linux/macOS/iOS projects, `cli/`, `server/` and the Rust crate/Dart package names
   (`localsend_app`, `localsend_isolates`) are intentionally unchanged to keep the protocol and merges simple.

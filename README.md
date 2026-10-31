@@ -18,8 +18,9 @@ upstream; they only received the new app ID and are not maintained here.
 3. When it finishes, download the zip (Windows) and APKs (Android) from **Artifacts** on the run page.
 
 Android: install `app-arm64-v8a-release.apk` (the build is 64-bit ARM only, which covers nearly all phones from the last several years).
-Builds are signed with a throwaway key unless you add the repository secrets `ANDROID_KEYSTORE_BASE64` and
-`ANDROID_KEY_PASSWORD` (key alias `airlink`); with a throwaway key, uninstall the previous version before updating.
+Builds are signed with the key in the repository secrets `ANDROID_KEYSTORE_BASE64` and `ANDROID_KEY_PASSWORD`
+(key alias `airlink`), so every build installs over the previous one. Without those secrets a throwaway key is used
+and you must uninstall the previous version before updating.
 
 Windows: the zip is unsigned, so SmartScreen shows a warning on first run (More info > Run anyway). Unzip it into its own
 folder and run `cindrix_airlink.exe`. When Windows Firewall asks, allow **Private networks**, otherwise other devices cannot find you.
