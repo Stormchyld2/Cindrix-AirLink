@@ -155,7 +155,7 @@ class DirectLink(private val context: Context) {
                 }
             }
             receiver = rx
-            val filter = IntentFilter(WifiP2pManager.WIFI_P2P_CONNECTION_STATE_CHANGE_ACTION)
+            val filter = IntentFilter(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION)
             if (Build.VERSION.SDK_INT >= 33) {
                 context.registerReceiver(rx, filter, Context.RECEIVER_NOT_EXPORTED)
             } else {
