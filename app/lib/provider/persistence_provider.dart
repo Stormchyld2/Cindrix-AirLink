@@ -210,10 +210,8 @@ class PersistenceService {
   }
 
   static Future<void> _initColorSetting(SharedPreferences prefs, bool supportsDynamicColors) async {
-    await prefs.setString(
-      _colorKey,
-      checkPlatform([TargetPlatform.android]) && supportsDynamicColors ? ColorMode.system.name : ColorMode.localsend.name,
-    );
+    // Cindrix AirLink uses its own blue/charcoal palette by default instead of the system's dynamic colors
+    await prefs.setString(_colorKey, ColorMode.localsend.name);
   }
 
   bool isPortableMode() {
@@ -290,9 +288,9 @@ class PersistenceService {
   ThemeMode getTheme() {
     final value = _prefs.getString(_themeKey);
     if (value == null) {
-      return ThemeMode.system;
+      return ThemeMode.dark; // Cindrix AirLink default: dark charcoal
     }
-    return ThemeMode.values.firstWhereOrNull((theme) => theme.name == value) ?? ThemeMode.system;
+    return ThemeMode.values.firstWhereOrNull((theme) => theme.name == value) ?? ThemeMode.dark;
   }
 
   Future<void> setTheme(ThemeMode theme) async {

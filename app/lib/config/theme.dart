@@ -9,6 +9,8 @@ import 'package:refena_flutter/refena_flutter.dart';
 import 'package:yaru/yaru.dart' as yaru;
 
 final _borderRadius = BorderRadius.circular(5);
+const _airlinkBlue = Color(0xFF3B9BFF);
+const _charcoal = Color(0xFF1F2226);
 
 ThemeData getTheme(ColorMode colorMode, Color customColor, Brightness brightness, DynamicColors? dynamicColors) {
   if (colorMode == ColorMode.yaru) {
@@ -141,10 +143,25 @@ extension InputDecorationThemeExt on InputDecorationThemeData {
 }
 
 ColorScheme _determineColorScheme(ColorMode mode, Color customColor, Brightness brightness, DynamicColors? dynamicColors) {
-  final defaultColorScheme = ColorScheme.fromSeed(
-    seedColor: Colors.teal,
+  // Cindrix AirLink default: blue accent on dark charcoal surfaces
+  final blueScheme = ColorScheme.fromSeed(
+    seedColor: _airlinkBlue,
     brightness: brightness,
   );
+  final defaultColorScheme = brightness == Brightness.dark
+      ? blueScheme.copyWith(
+          primary: const Color(0xFF67B4FF),
+          surface: _charcoal,
+          surfaceDim: _charcoal,
+          surfaceBright: const Color(0xFF3A3F45),
+          surfaceContainerLowest: const Color(0xFF1A1D20),
+          surfaceContainerLow: const Color(0xFF24282C),
+          surfaceContainer: const Color(0xFF2A2E33),
+          surfaceContainerHigh: const Color(0xFF30353A),
+          surfaceContainerHighest: const Color(0xFF363B41),
+          surfaceTint: Colors.transparent,
+        )
+      : blueScheme;
 
   final colorScheme = switch (mode) {
     ColorMode.system => brightness == Brightness.light ? dynamicColors?.light : dynamicColors?.dark,
