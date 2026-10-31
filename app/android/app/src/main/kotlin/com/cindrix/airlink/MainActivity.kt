@@ -137,6 +137,7 @@ class MainActivity : FlutterActivity() {
                 "directLinkSupported" -> result.success(directLink.isSupported())
                 "directLinkStart" -> directLink.startGroup { result.success(it) }
                 "directLinkJoin" -> directLink.join(call.argument<String>("ssid")!!, call.argument<String>("passphrase")!!) { result.success(it) }
+                "directLinkClients" -> directLink.clientCount { result.success(it) }
                 "directLinkStop" -> directLink.stop { result.success(null) }
 
                 "hotspotSupported" -> result.success(localHotspot.isSupported())

@@ -51,7 +51,7 @@ class _WebSharePageState extends State<WebSharePage> with Refena {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _init(encrypted: false);
+      _init(encrypted: true);
     });
   }
 
@@ -186,7 +186,15 @@ class _WebSharePageState extends State<WebSharePage> with Refena {
             return ResponsiveListView(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
               children: [
-                PrivateNetworkCard(port: serverState.port, pin: pin, encrypted: _encrypted),
+                PrivateNetworkCard(
+                  port: serverState.port,
+                  pin: pin,
+                  encrypted: _encrypted,
+                  // Friends with no app cannot tap Accept on our phone's behalf, so let their download through.
+                  onStarted: () {
+                    if (widget.files != null) ref.notifier(serverProvider).setWebDownloadAutoAccept(true);
+                  },
+                ),
                 Text(t.webSharePage.openLink(n: networkState.localIps.length), style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 10),
                 Card(

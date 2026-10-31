@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -16,7 +17,10 @@ class PrivateNetworkCard extends StatefulWidget {
   final String? pin;
   final bool encrypted;
 
-  const PrivateNetworkCard({required this.port, required this.pin, required this.encrypted});
+  /// Called when the private network is up, so the page can let downloads through without a manual accept.
+  final VoidCallback? onStarted;
+
+  const PrivateNetworkCard({required this.port, required this.pin, required this.encrypted, this.onStarted});
 
   @override
   State<PrivateNetworkCard> createState() => _PrivateNetworkCardState();
@@ -29,6 +33,28 @@ class _PrivateNetworkCardState extends State<PrivateNetworkCard> {
   String? _passphrase;
   String? _hostIp;
   bool _showStep2 = false;
+  Timer? _poll;
+
+  @override
+  void dispose() {
+    _poll?.cancel();
+    super.dispose();
+  }
+
+  /// Wi-Fi Direct tells us when a device joins, so step 2 can appear by itself.
+  void _watchForFriend() {
+    _poll?.cancel();
+    _poll = Timer.periodic(const Duration(seconds: 2), (_) async {
+      if (!mounted || _showStep2 || !_active) {
+        _poll?.cancel();
+        return;
+      }
+      if (await directLinkClientCount() > 0 && mounted) {
+        setState(() => _showStep2 = true);
+        _poll?.cancel();
+      }
+    });
+  }
 
   bool get _active => _ssid != null;
 
@@ -104,6 +130,8 @@ class _PrivateNetworkCardState extends State<PrivateNetworkCard> {
         _hostIp = ip;
         _showStep2 = false;
       });
+      widget.onStarted?.call();
+      if (method == LinkMethod.direct) _watchForFriend();
       return;
     }
 
@@ -114,6 +142,7 @@ class _PrivateNetworkCardState extends State<PrivateNetworkCard> {
   }
 
   Future<void> _stop() async {
+    _poll?.cancel();
     await LinkWatcher.end();
     if (!mounted) return;
     setState(() {
@@ -207,13 +236,14 @@ class _PrivateNetworkCardState extends State<PrivateNetworkCard> {
               if (!_showStep2)
                 FilledButton(
                   onPressed: () => setState(() => _showStep2 = true),
-                  child: const Text('They are connected — show step 2'),
+                  child: const Text('Not showing up? Tap here for step 2'),
                 )
               else ...[
                 _stepTitle(context, '2', 'Get the file'),
                 const SizedBox(height: 6),
                 Text(
-                  'Now point the camera at this second code. It opens a page with the download button.',
+                  'Now point the camera at this second code. It opens a page with the download button. '
+                  'If the browser warns the page is "not private", tap Advanced, then Continue. That is normal on a private network.',
                   style: theme.textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 10),

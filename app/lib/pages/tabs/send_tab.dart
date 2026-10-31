@@ -202,6 +202,13 @@ class SendTab extends StatelessWidget {
                     child: const Icon(Icons.qr_code),
                   ),
                 ),
+                Tooltip(
+                  message: 'Share with anyone',
+                  child: CustomIconButton(
+                    onPressed: () async => await vm.onTapSendMode(context, SendMode.link),
+                    child: const Icon(Icons.wifi_tethering),
+                  ),
+                ),
                 _SendModeButton(
                   onSelect: (mode) async => vm.onTapSendMode(context, mode),
                 ),

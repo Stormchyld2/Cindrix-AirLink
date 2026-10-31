@@ -158,7 +158,7 @@ Entry points: Send tab (QR icon), Receive/Home tab (primary "Pair a device" butt
   Android/Windows/MSIX/web icons from the SVGs. Launcher icons need a solid charcoal background (Android requirement);
   the wordmark and glyph PNGs are transparent.
 
-### 4.7 Share with anyone (friend has no app) — built, untested
+### 4.7 Share with anyone (friend has no app) — built, tested once on two phones
 
 For people with neither AirLink nor LocalSend. Lives in `app/lib/widget/private_network_card.dart`, shown at the top of
 the web share page (`web_share_page.dart`, both "send via link" and "receive via link", Android only).
@@ -166,8 +166,12 @@ the web share page (`web_share_page.dart`, both "send via link" and "receive via
 1. "Create private network": starts the stored Wi-Fi Direct group (fallback: local-only hotspot) via the link layer.
    The host address is the group owner IP (`192.168.49.1`) or, for the hotspot, the new IPv4 address that appears after start.
 2. **Step 1 QR** is a standard Wi-Fi code (`WIFI:T:WPA;S:<ssid>;P:<pass>;;`). Any phone camera offers "Connect".
-3. **Step 2 QR** (revealed by a button once the friend is connected) is `http://<host>:<port>` (plus `?pin=` if a PIN
+3. **Step 2 QR** (revealed automatically when `requestGroupInfo` reports a client in the Wi-Fi Direct group, polled every 2 s;
+   a button is the fallback, e.g. for the hotspot) is `https://<host>:<port>` (encryption is the default; the browser shows a
+   "not private" warning that the step text explains) (plus `?pin=` if a PIN
    is set); the same address is printed large for typing. The page is the existing web share server (binds `0.0.0.0`).
+   Downloads are auto-accepted for this flow (a friend with no app cannot be approved on the sender's phone by hand).
+   Entry points: Home tab and Send tab buttons ("Share with anyone") plus the old "Share via link" menu.
 4. The link is opened with `LinkWatcher.begin(..., keepOpen: true)` (no automatic timeout, because web transfers are not
    visible to the watcher). It is closed by the "Done" button or when the share page is left.
 5. The friend-facing HTML (`packages/core/assets/web/*.html`) is rebranded and dark charcoal/blue.

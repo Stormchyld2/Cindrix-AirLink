@@ -133,6 +133,21 @@ class DirectLink(private val context: Context) {
         }
     }
 
+    /** Number of devices currently connected to the group this phone hosts. */
+    fun clientCount(done: (Int) -> Unit) {
+        val mgr = manager
+        val ch = channel
+        if (mgr == null || ch == null) {
+            done(0)
+            return
+        }
+        try {
+            mgr.requestGroupInfo(ch) { group -> done(group?.clientList?.size ?: 0) }
+        } catch (e: Exception) {
+            done(0)
+        }
+    }
+
     /** Joins a group created by [startGroup] on another device. Completes when the link is up. */
     fun join(ssid: String, passphrase: String, done: (Map<String, Any?>) -> Unit) {
         val callback = once(done)

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:localsend_app/config/theme.dart';
 import 'package:localsend_app/gen/strings.g.dart';
+import 'package:localsend_app/model/send_mode.dart';
 import 'package:localsend_app/model/state/server/server_state.dart';
 import 'package:localsend_app/pages/pair_page.dart';
 import 'package:localsend_app/pages/receive_history_page.dart';
+import 'package:localsend_app/pages/tabs/send_tab_vm.dart';
 import 'package:localsend_app/pages/web_share_page.dart';
 import 'package:localsend_app/provider/local_ip_provider.dart';
 import 'package:localsend_app/provider/network/server/server_provider.dart';
@@ -111,6 +113,11 @@ class _ReceiveTabState extends State<ReceiveTab> {
                             },
                             icon: const Icon(Icons.qr_code),
                             label: const Text('Pair a device'),
+                          ),
+                          FilledButton.tonalIcon(
+                            onPressed: () => context.ref.read(sendTabVmProvider).onTapSendMode(context, SendMode.link),
+                            icon: const Icon(Icons.wifi_tethering),
+                            label: const Text('Share with anyone'),
                           ),
                           OutlinedButton.icon(
                             onPressed: () async {

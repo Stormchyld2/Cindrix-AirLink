@@ -113,6 +113,16 @@ Future<LinkResult> joinLink(LinkMethod method, String ssid, String passphrase) a
   }
 }
 
+/// How many devices are connected to the Wi-Fi Direct group this phone hosts (0 if unknown).
+Future<int> directLinkClientCount() async {
+  if (!_isAndroid) return 0;
+  try {
+    return await _channel.invokeMethod<int>('directLinkClients') ?? 0;
+  } catch (_) {
+    return 0;
+  }
+}
+
 Future<void> _stopNative() async {
   if (!_isAndroid) return;
   for (final name in ['directLinkStop', 'hotspotStop']) {
