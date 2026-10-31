@@ -17,11 +17,24 @@ upstream; they only received the new app ID and are not maintained here.
 2. Click **Run workflow**.
 3. When it finishes, download the zip (Windows) and APKs (Android) from **Artifacts** on the run page.
 
-Android: install `app-arm64-v8a-release.apk` on most phones and tablets (`armeabi-v7a` for older 32-bit devices).
+Android: install `app-arm64-v8a-release.apk` (the build is 64-bit ARM only, which covers nearly all phones from the last several years).
 Builds are signed with a throwaway key unless you add the repository secrets `ANDROID_KEYSTORE_BASE64` and
 `ANDROID_KEY_PASSWORD` (key alias `airlink`); with a throwaway key, uninstall the previous version before updating.
 
-Windows: the zip is unsigned, so SmartScreen shows a warning on first run.
+Windows: the zip is unsigned, so SmartScreen shows a warning on first run (More info > Run anyway). Unzip it into its own
+folder and run `cindrix_airlink.exe`. When Windows Firewall asks, allow **Private networks**, otherwise other devices cannot find you.
+
+## Pairing devices (no router needed)
+
+Open **Pair a device** (QR button on the Send tab, button on the Receive tab, or Settings). One device taps
+*Start link and show code*, the other taps *Scan a code*. Connection methods, in order of preference:
+
+1. **Wi-Fi Direct**: a private device-to-device link, no router, hotspot or internet (Android 10+). Paired devices
+   rejoin later without scanning again, and the link closes itself shortly after the transfer ends.
+2. **Phone hotspot**: the phone's local-only hotspot (no internet needed); needs a fresh scan each time.
+3. **Same Wi-Fi**: both devices are already on the same network.
+
+Windows can show a code and use shared Wi-Fi, but cannot start or join Wi-Fi Direct yet.
 
 ## Building locally
 

@@ -133,9 +133,9 @@ One socket is bound per interface IPv4 address (`SO_REUSEPORT`/`SO_REUSEADDR` + 
 
 Slang, source files in `app/assets/i18n/` (`<locale>.json` plus `_missing_translations_<locale>.json`), generated output in `app/lib/gen/`. Translations are managed on Weblate; fields prefixed with `@` are metadata for translators and are not used by the app. `app/test/unit/i18n_test.dart` guards the locale set.
 
-### FOSS build
+### Store/FOSS build
 
-`in_app_purchase` and the donation UI are stripped for F-Droid by `support/scripts/remove_proprietary_dependencies.sh`, which relies on the `# [FOSS_REMOVE]` pubspec marker and `// [FOSS_REMOVE_START]` / `// [FOSS_REMOVE_END]` comment pairs. Preserve those markers when editing `lib/config/init.dart`, `lib/pages/donation/*`, or `lib/provider/purchase_provider.dart`.
+The donation UI and `in_app_purchase` were removed from this fork, so the upstream FOSS-stripping script and its markers no longer apply.
 
 ## Release notes
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:localsend_app/gen/strings.g.dart';
 import 'package:localsend_app/model/state/server/server_state.dart';
+import 'package:localsend_app/pages/pair_page.dart';
 import 'package:localsend_app/pages/receive_history_page.dart';
 import 'package:localsend_app/pages/web_share_page.dart';
 import 'package:localsend_app/provider/local_ip_provider.dart';
@@ -91,12 +92,26 @@ class _ReceiveTabState extends State<ReceiveTab> {
                   Padding(
                     padding: const EdgeInsets.only(top: 10),
                     child: Center(
-                      child: OutlinedButton.icon(
-                        onPressed: () async {
-                          await context.global.dispatchAsync(NavigateAction.push(const WebSharePage()));
-                        },
-                        icon: Icon(Icons.language),
-                        label: Text(t.receiveTab.link),
+                      child: Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        alignment: WrapAlignment.center,
+                        children: [
+                          OutlinedButton.icon(
+                            onPressed: () async {
+                              await context.global.dispatchAsync(NavigateAction.push(const WebSharePage()));
+                            },
+                            icon: Icon(Icons.language),
+                            label: Text(t.receiveTab.link),
+                          ),
+                          OutlinedButton.icon(
+                            onPressed: () async {
+                              await context.global.dispatchAsync(NavigateAction.push(const PairPage()));
+                            },
+                            icon: const Icon(Icons.qr_code),
+                            label: const Text('Pair a device'),
+                          ),
+                        ],
                       ),
                     ),
                   ),

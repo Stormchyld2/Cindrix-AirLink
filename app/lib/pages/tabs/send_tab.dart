@@ -14,6 +14,7 @@ import 'package:localsend_app/provider/network/scan_facade.dart';
 import 'package:localsend_app/provider/network/send_provider.dart';
 import 'package:localsend_app/provider/selection/selected_sending_files_provider.dart';
 import 'package:localsend_app/provider/settings_provider.dart';
+import 'package:localsend_app/pages/pair_page.dart';
 import 'package:localsend_app/util/favorites.dart';
 import 'package:localsend_app/util/native/file_picker.dart';
 import 'package:localsend_app/util/native/platform_check.dart';
@@ -192,6 +193,13 @@ class SendTab extends StatelessWidget {
                   child: CustomIconButton(
                     onPressed: () async => await vm.onTapFavorite(context),
                     child: const Icon(Icons.favorite),
+                  ),
+                ),
+                Tooltip(
+                  message: 'Pair a device (QR code)',
+                  child: CustomIconButton(
+                    onPressed: () async => await context.push(() => const PairPage()),
+                    child: const Icon(Icons.qr_code),
                   ),
                 ),
                 _SendModeButton(
