@@ -171,12 +171,17 @@ class LinkWatcher {
 
   static bool _isBusy(SessionStatus status) => status == SessionStatus.waiting || status == SessionStatus.sending;
 
-  static void _tick() {
-    if (_keepOpen) return;
+  /// `true` while a file is being sent or received.
+  static bool get transferBusy {
     final ref = RefenaScope.defaultRef;
     final receiving = ref.read(serverProvider)?.session;
     final sending = ref.read(sendProvider).values;
-    final busy = (receiving != null && _isBusy(receiving.status)) || sending.any((s) => _isBusy(s.status));
+    return (receiving != null && _isBusy(receiving.status)) || sending.any((s) => _isBusy(s.status));
+  }
+
+  static void _tick() {
+    if (_keepOpen) return;
+    final busy = transferBusy;
     final now = DateTime.now();
 
     if (busy) {

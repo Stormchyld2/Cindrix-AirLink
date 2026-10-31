@@ -10,6 +10,7 @@ import 'package:localsend_app/pages/web_share_page.dart';
 import 'package:localsend_app/provider/local_ip_provider.dart';
 import 'package:localsend_app/provider/network/server/server_provider.dart';
 import 'package:localsend_app/provider/settings_provider.dart';
+import 'package:localsend_app/util/native/ready_mode.dart';
 import 'package:localsend_app/widget/animations/initial_fade_transition.dart';
 import 'package:localsend_app/widget/column_list_view.dart';
 import 'package:localsend_app/widget/custom_icon_button.dart';
@@ -85,15 +86,18 @@ class _ReceiveTabState extends State<ReceiveTab> {
                         InitialFadeTransition(
                           duration: const Duration(milliseconds: 300),
                           delay: const Duration(milliseconds: 500),
-                          child: Text(
-                            serverState == null ? 'OFFLINE' : 'ONLINE · READY TO RECEIVE',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 3,
-                              color: serverState == null ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.primary,
+                          child: ValueListenableBuilder<bool>(
+                            valueListenable: ReadyMode.ready,
+                            builder: (context, ready, _) => Text(
+                              serverState == null ? 'OFFLINE' : (ready ? 'READY · DIRECT LINK' : 'ONLINE · READY TO RECEIVE'),
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 3,
+                                color: serverState == null ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.primary,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
                           ),
                         ),
                       ],

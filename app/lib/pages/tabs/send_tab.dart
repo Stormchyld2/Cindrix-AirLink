@@ -245,6 +245,21 @@ class SendTab extends StatelessWidget {
                 ),
               );
             }),
+            if (checkPlatform([TargetPlatform.android]))
+              ...vm.favoriteDevices.where((f) => !vm.nearbyDevices.any((d) => d.fingerprint == f.fingerprint)).map((favorite) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 10, left: _horizontalPadding, right: _horizontalPadding),
+                  child: Card(
+                    margin: EdgeInsets.zero,
+                    child: ListTile(
+                      leading: const Icon(Icons.link),
+                      title: Text(favorite.alias),
+                      subtitle: const Text('PAIRED · tap to connect and send'),
+                      onTap: () async => await vm.onTapPaired(context, favorite),
+                    ),
+                  ),
+                );
+              }),
             const SizedBox(height: 10),
             Center(
               child: TextButton(

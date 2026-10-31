@@ -194,7 +194,13 @@ stay connected?" prompt appear and can it be answered easily? Is a transfer-comp
 - Known upstream leftovers: the Linux/macOS/iOS projects, `cli/`, `server/` and the Rust crate/Dart package names
   (`localsend_app`, `localsend_isolates`) are intentionally unchanged to keep the protocol and merges simple.
 
-## 6. Planned next: one-tap "Ready" mode (Android ↔ Android)
+## 6. One-tap "Ready" mode (Android ↔ Android) — phase 1 built, untested
+
+Phase 1 (built): `util/native/ready_mode.dart` starts the stored Wi-Fi Direct group when there is no real network (addresses in
+192.168.49.x do not count) while the app is on screen, and stops it in the background; Home shows `READY · DIRECT LINK`;
+the Send tab lists paired phones that are not nearby ("PAIRED · tap to connect and send") and `util/native/quick_connect.dart`
+releases our own group, joins the other phone's by stored credentials, registers, and starts the normal send. Settings has a
+"Ready mode" toggle. Phase 2 (not built): foreground service so Ready survives screen-off and a closed app.
 
 Goal (owner's request): *"between Android phones, least steps; Wi-Fi Direct starts in the background and shows
 Ready; send, then it turns itself off."* Windows may keep using a shared network. **Do not start until the base

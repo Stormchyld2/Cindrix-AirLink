@@ -18,6 +18,7 @@ import 'package:localsend_app/util/native/device_info_helper.dart';
 import 'package:localsend_app/util/native/macos_channel.dart';
 import 'package:localsend_app/util/native/pick_directory_path.dart';
 import 'package:localsend_app/util/native/platform_check.dart';
+import 'package:localsend_app/util/native/ready_mode.dart';
 import 'package:localsend_app/widget/custom_dropdown_button.dart';
 import 'package:localsend_app/widget/dialogs/encryption_disabled_notice.dart';
 import 'package:localsend_app/widget/dialogs/pin_dialog.dart';
@@ -531,6 +532,16 @@ class SettingsTab extends StatelessWidget {
               title: t.settingsTab.other.title,
               padding: const EdgeInsets.only(bottom: 0),
               children: [
+                if (checkPlatform([TargetPlatform.android]))
+                  ValueListenableBuilder<bool>(
+                    valueListenable: ReadyMode.enabled,
+                    builder: (context, enabled, _) => _BooleanEntry(
+                      label: 'Ready mode',
+                      description: 'With no Wi-Fi, open a private direct link so paired phones can connect with one tap (while AirLink is open).',
+                      value: enabled,
+                      onChanged: (value) => ReadyMode.setEnabled(value),
+                    ),
+                  ),
                 _ButtonEntry(
                   label: 'Pair a device',
                   buttonLabel: t.general.open,

@@ -14,6 +14,7 @@ import 'package:localsend_app/provider/network/scan_facade.dart';
 import 'package:localsend_app/provider/network/send_provider.dart';
 import 'package:localsend_app/provider/selection/selected_sending_files_provider.dart';
 import 'package:localsend_app/provider/settings_provider.dart';
+import 'package:localsend_app/util/native/quick_connect.dart';
 import 'package:localsend_app/widget/dialogs/add_file_dialog.dart';
 import 'package:localsend_app/widget/dialogs/address_input_dialog.dart';
 import 'package:localsend_app/widget/dialogs/favorite_dialog.dart';
@@ -33,6 +34,7 @@ class SendTabVm {
   final Future<void> Function(BuildContext context, SendMode mode) onTapSendMode;
   final Future<void> Function(BuildContext context, Device device) onTapDevice;
   final Future<void> Function(BuildContext context, Device device) onTapDeviceMultiSend;
+  final Future<void> Function(BuildContext context, FavoriteDevice favorite) onTapPaired;
 
   const SendTabVm({
     required this.sendMode,
@@ -45,6 +47,7 @@ class SendTabVm {
     required this.onTapSendMode,
     required this.onTapDevice,
     required this.onTapDeviceMultiSend,
+    required this.onTapPaired,
   });
 }
 
@@ -154,6 +157,34 @@ final sendTabVmProvider = ViewProvider((ref) {
       files = ref.read(selectedSendingFilesProvider);
 
       if (files.isEmpty) {
+        return;
+      }
+
+      await ref
+          .notifier(sendProvider)
+          .startSession(
+            target: device,
+            files: files,
+            background: false,
+          );
+    },
+    onTapPaired: (context, favorite) async {
+      var files = ref.read(selectedSendingFilesProvider);
+      if (files.isEmpty) {
+        await AddFileDialog.open(
+          context: context,
+          options: pickerOptions,
+        );
+      }
+
+      files = ref.read(selectedSendingFilesProvider);
+
+      if (files.isEmpty || !context.mounted) {
+        return;
+      }
+
+      final device = await quickConnect(context, ref, favorite);
+      if (device == null) {
         return;
       }
 
