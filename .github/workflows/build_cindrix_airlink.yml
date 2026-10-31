@@ -1,7 +1,7 @@
 name: Build Cindrix AirLink (Windows + Android)
 
 # Starts when you click GitHub > Actions > "Build Cindrix AirLink" > Run workflow,
-# or when a tag named build-* is pushed (e.g. build-2).
+# or whenever the branch named "build" is pushed.
 # Download the results from the run page under "Artifacts". No Flutter needed on your own PC.
 #
 # Windows: unsigned portable zip (Windows SmartScreen will warn on first run - expected for unsigned apps).
@@ -13,8 +13,8 @@ name: Build Cindrix AirLink (Windows + Android)
 on:
   workflow_dispatch:
   push:
-    tags:
-      - "build-*"
+    branches:
+      - build
 
 env:
   FLUTTER_VERSION: "3.41.9"
