@@ -127,35 +127,21 @@ jobs:
         env:
           KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          REPO_PRIVATE: ${{ github.event.repository.private }}
         run: |
-          mkdir -p "$RUNNER_TEMP/ks"
-          if [ -n "$KEYSTORE_B64" ]; then
-            echo "Using signing key from repository secrets"
-            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/ks/airlink.jks"
-            PASS="$KEY_PASSWORD"
-            cat > app/android/key.properties <<EOF
-          storePassword=$PASS
-          keyPassword=$PASS
-          keyAlias=airlink
-          storeFile=$RUNNER_TEMP/ks/airlink.jks
-          EOF
-          elif [ -f signing/airlink.jks ] && [ -f signing/key.properties ] && [ "$REPO_PRIVATE" = "true" ]; then
-            echo "Using fixed signing key from signing/ (repository is private)"
-            cp signing/key.properties app/android/key.properties
-            sed -i "s#^storeFile=.*#storeFile=$GITHUB_WORKSPACE/signing/airlink.jks#" app/android/key.properties
-          else
-            echo "::warning::No usable fixed key (secrets missing, and the repository is not private or signing/ is absent). Signing with a throwaway key; uninstall the old app before installing this APK."
-            PASS="$(openssl rand -hex 16)"
-            keytool -genkeypair -keystore "$RUNNER_TEMP/ks/airlink.jks" -alias airlink -keyalg RSA -keysize 2048 -validity 10000 \
-              -storepass "$PASS" -keypass "$PASS" -dname "CN=Cindrix AirLink, O=Cindrix"
-            cat > app/android/key.properties <<EOF
-          storePassword=$PASS
-          keyPassword=$PASS
-          keyAlias=airlink
-          storeFile=$RUNNER_TEMP/ks/airlink.jks
-          EOF
+          # One permanent key for every build, so each APK installs over the previous one.
+          # No fallback key on purpose: a build signed with a different key could not update the installed app.
+          if [ -z "$KEYSTORE_B64" ] || [ -z "$KEY_PASSWORD" ]; then
+            echo "::error::Missing repository secrets ANDROID_KEYSTORE_BASE64 and/or ANDROID_KEY_PASSWORD. Add them under Settings > Secrets and variables > Actions, then run again."
+            exit 1
           fi
+          mkdir -p "$RUNNER_TEMP/ks"
+          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/ks/airlink.jks"
+          cat > app/android/key.properties <<EOF
+          storePassword=$KEY_PASSWORD
+          keyPassword=$KEY_PASSWORD
+          keyAlias=airlink
+          storeFile=$RUNNER_TEMP/ks/airlink.jks
+          EOF
 
       - name: Dependencies
         working-directory: app

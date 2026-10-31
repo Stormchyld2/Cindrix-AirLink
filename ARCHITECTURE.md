@@ -139,7 +139,7 @@ Entry points: Send tab (QR icon), Receive/Home tab (primary "Pair a device" butt
 - Android signing: the old key that lived in `signing/` was exposed while the repo was public, so it was **retired and
   removed**. The real release key is a new one stored only in the repository secrets `ANDROID_KEYSTORE_BASE64` and
   `ANDROID_KEY_PASSWORD` (alias `airlink`), plus an offline backup kept by the owner. Never commit a key to the repo.
-  Until those secrets exist, builds use a throwaway key (uninstall the old app before each update).
+  Without those secrets the Android build stops with an error.
 - The app contains no update checks, analytics, or calls to LocalSend/Cindrix servers. Web share is plain http by
   default (browsers will not accept our self-signed certificate); keep it to trusted networks.
 
@@ -165,8 +165,8 @@ Entry points: Send tab (QR icon), Receive/Home tab (primary "Pair a device" butt
   Artifacts: Windows = one zip with the app files at its root; Android = the arm64 APK (single ABI, to stay within
   the runner's disk space).
 - The Android build frees runner disk first and builds `android-arm64` only.
-- Android signing: repository secrets if set → throwaway key (then each build has a different signature, so uninstall
-  before updating). The old committed-key option is still in the workflow but `signing/` no longer exists.
+- Android signing: the build requires the repository secrets and **fails if they are missing** (no throwaway fallback), so
+  every APK is signed with the one permanent key and installs over the previous one.
 - Pushing to `main` alone does not build anything.
 - Known upstream leftovers: the Linux/macOS/iOS projects, `cli/`, `server/` and the Rust crate/Dart package names
   (`localsend_app`, `localsend_isolates`) are intentionally unchanged to keep the protocol and merges simple.
