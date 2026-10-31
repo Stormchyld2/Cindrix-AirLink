@@ -10,8 +10,19 @@ name: Build Cindrix AirLink (Windows + Android)
 #          To get a stable key, add the repository secrets ANDROID_KEYSTORE_BASE64 and ANDROID_KEY_PASSWORD
 #          (key alias must be "airlink").
 
+# Windows builds use twice the free monthly minutes of Android builds, so a push to "build" only builds Android.
+# Use "Run workflow" to pick Windows, Android, or both.
 on:
   workflow_dispatch:
+    inputs:
+      windows:
+        description: "Build Windows"
+        type: boolean
+        default: true
+      android:
+        description: "Build Android"
+        type: boolean
+        default: true
   push:
     branches:
       - build
@@ -21,6 +32,7 @@ env:
 
 jobs:
   windows:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.windows }}
     runs-on: windows-latest
     steps:
       - name: Fix long file paths
@@ -82,6 +94,7 @@ jobs:
           if-no-files-found: error
 
   android:
+    if: ${{ github.event_name == 'push' || inputs.android }}
     runs-on: ubuntu-22.04
     steps:
       - name: Free up disk space
