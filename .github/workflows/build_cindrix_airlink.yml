@@ -164,9 +164,17 @@ jobs:
         working-directory: app
         run: flutter build apk --split-per-abi --target-platform android-arm64
 
+      - name: Name the APK
+        id: apk
+        run: |
+          VERSION=$(sed -n 's/^version: \([0-9]*\.[0-9]*\.[0-9]*\).*/\1/p' app/pubspec.yaml)
+          NAME="app-airlink-${VERSION}-release.apk"
+          cp app/build/app/outputs/flutter-apk/app-arm64-v8a-release.apk "app/build/app/outputs/flutter-apk/${NAME}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "path=app/build/app/outputs/flutter-apk/${NAME}" >> "$GITHUB_OUTPUT"
+
       - uses: actions/upload-artifact@v6
         with:
-          name: CindrixAirLink-android-apks
-          path: |
-            app/build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+          name: CindrixAirLink-${{ steps.apk.outputs.version }}-android
+          path: ${{ steps.apk.outputs.path }}
           if-no-files-found: error
