@@ -55,7 +55,7 @@ class _PairPageState extends State<PairPage> with Refena {
 
     final me = ref.read(deviceFullInfoProvider);
     final fingerprint = me.fingerprint;
-    if (fingerprint == null || me.port <= 0) {
+    if (me.port <= 0) {
       setState(() {
         _busy = false;
         _status = null;
@@ -69,11 +69,12 @@ class _PairPageState extends State<PairPage> with Refena {
 
     for (final method in order) {
       if (method == LinkMethod.lan) {
-        if (me.ip == '-') {
+        final lanIp = me.ip;
+        if (lanIp == null || lanIp == '-') {
           lastError ??= 'Not connected to a Wi-Fi network.';
           continue;
         }
-        _showPayload(PairingPayload(alias: me.alias, fingerprint: fingerprint, ip: me.ip, port: me.port, https: me.https, method: method));
+        _showPayload(PairingPayload(alias: me.alias, fingerprint: fingerprint, ip: lanIp, port: me.port, https: me.https, method: method));
         return;
       }
 
