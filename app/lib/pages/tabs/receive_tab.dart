@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:localsend_app/config/theme.dart';
 import 'package:localsend_app/gen/strings.g.dart';
 import 'package:localsend_app/model/state/server/server_state.dart';
 import 'package:localsend_app/pages/pair_page.dart';
@@ -7,7 +8,6 @@ import 'package:localsend_app/pages/web_share_page.dart';
 import 'package:localsend_app/provider/local_ip_provider.dart';
 import 'package:localsend_app/provider/network/server/server_provider.dart';
 import 'package:localsend_app/provider/settings_provider.dart';
-import 'package:localsend_app/util/ip_helper.dart';
 import 'package:localsend_app/widget/animations/initial_fade_transition.dart';
 import 'package:localsend_app/widget/column_list_view.dart';
 import 'package:localsend_app/widget/custom_icon_button.dart';
@@ -75,14 +75,22 @@ class _ReceiveTabState extends State<ReceiveTab> {
                         ),
                         FittedBox(
                           fit: BoxFit.scaleDown,
-                          child: Text(serverState?.alias ?? alias, style: const TextStyle(fontSize: 48)),
+                          child: Text(
+                            serverState?.alias ?? alias,
+                            style: const TextStyle(fontSize: 56, fontFamily: airLinkHeadingFont, fontWeight: FontWeight.w700, letterSpacing: 2),
+                          ),
                         ),
                         InitialFadeTransition(
                           duration: const Duration(milliseconds: 300),
                           delay: const Duration(milliseconds: 500),
                           child: Text(
-                            serverState == null ? t.general.offline : localIps.map((ip) => '#${ip.visualId}').toSet().join(' '),
-                            style: const TextStyle(fontSize: 24),
+                            serverState == null ? 'OFFLINE' : 'ONLINE · READY TO RECEIVE',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 3,
+                              color: serverState == null ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.primary,
+                            ),
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -97,19 +105,19 @@ class _ReceiveTabState extends State<ReceiveTab> {
                         runSpacing: 10,
                         alignment: WrapAlignment.center,
                         children: [
+                          FilledButton.icon(
+                            onPressed: () async {
+                              await context.global.dispatchAsync(NavigateAction.push(const PairPage()));
+                            },
+                            icon: const Icon(Icons.qr_code),
+                            label: const Text('Pair a device'),
+                          ),
                           OutlinedButton.icon(
                             onPressed: () async {
                               await context.global.dispatchAsync(NavigateAction.push(const WebSharePage()));
                             },
                             icon: Icon(Icons.language),
                             label: Text(t.receiveTab.link),
-                          ),
-                          OutlinedButton.icon(
-                            onPressed: () async {
-                              await context.global.dispatchAsync(NavigateAction.push(const PairPage()));
-                            },
-                            icon: const Icon(Icons.qr_code),
-                            label: const Text('Pair a device'),
                           ),
                         ],
                       ),

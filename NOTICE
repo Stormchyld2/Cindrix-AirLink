@@ -11,3 +11,6 @@ Licensed under the Apache License, Version 2.0.
 Changes from the original: application name and identifiers, Windows and Android packaging,
 removal of donation and in-app purchase code, replacement of upstream links, and added build workflow.
 The unmodified upstream snapshot is the first commit of this repository.
+
+Fonts: the heading font is TeX Gyre Heros Condensed Bold (copyright GUST e-foundry), used under the GUST Font License;
+see app/assets/fonts/GUST-FONT-LICENSE.txt.

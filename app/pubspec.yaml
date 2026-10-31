@@ -112,5 +112,11 @@ flutter:
     - assets/img/
     - assets/CHANGELOG.md
 
+  fonts:
+    - family: AirLinkHeading
+      fonts:
+        - asset: assets/fonts/texgyreheroscn-bold.otf
+          weight: 700
+
 flutter_gen:
   line_length: 150

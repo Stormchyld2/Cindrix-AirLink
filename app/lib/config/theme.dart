@@ -9,6 +9,9 @@ import 'package:refena_flutter/refena_flutter.dart';
 import 'package:yaru/yaru.dart' as yaru;
 
 final _borderRadius = BorderRadius.circular(5);
+
+/// Font family used for headings and the device callsign.
+const airLinkHeadingFont = 'AirLinkHeading';
 const _airlinkBlue = Color(0xFF3B9BFF);
 const _charcoal = Color(0xFF1F2226);
 
@@ -51,7 +54,7 @@ ThemeData getTheme(ColorMode colorMode, Color customColor, Brightness brightness
     fontFamily = null;
   }
 
-  return ThemeData(
+  final base = ThemeData(
     colorScheme: colorScheme,
     useMaterial3: true,
     // same density on all platforms so desktop matches mobile (defaults to compact on desktop)
@@ -81,6 +84,21 @@ ThemeData getTheme(ColorMode colorMode, Color customColor, Brightness brightness
       ),
     ),
     fontFamily: fontFamily,
+  );
+
+  // Condensed, heavy headings (same look as the Cindrix AirLink wordmark); body text keeps the platform font.
+  TextStyle? heading(TextStyle? style) => style?.copyWith(fontFamily: airLinkHeadingFont, fontWeight: FontWeight.w700, letterSpacing: 0.8);
+  final textTheme = base.textTheme;
+  return base.copyWith(
+    textTheme: textTheme.copyWith(
+      displayLarge: heading(textTheme.displayLarge),
+      displayMedium: heading(textTheme.displayMedium),
+      displaySmall: heading(textTheme.displaySmall),
+      headlineLarge: heading(textTheme.headlineLarge),
+      headlineMedium: heading(textTheme.headlineMedium),
+      headlineSmall: heading(textTheme.headlineSmall),
+      titleLarge: heading(textTheme.titleLarge),
+    ),
   );
 }
 
