@@ -74,14 +74,11 @@ jobs:
           Remove-Item build/windows/x64/runner/Release/install_msix_helper.ps1
           Remove-Item build/windows/x64/runner/Release/cindrix_airlink.exe.manifest
 
-      - name: Zip
-        working-directory: app
-        run: Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath "CindrixAirLink-${{ steps.ver.outputs.version }}-windows-x86-64.zip"
-
+      # No zip step: GitHub already zips the artifact, so the download is a single zip with the app files at its root.
       - uses: actions/upload-artifact@v6
         with:
-          name: CindrixAirLink-windows-x86-64
-          path: app/CindrixAirLink-${{ steps.ver.outputs.version }}-windows-x86-64.zip
+          name: CindrixAirLink-${{ steps.ver.outputs.version }}-windows-x86-64
+          path: app/build/windows/x64/runner/Release/
           if-no-files-found: error
 
   android:
