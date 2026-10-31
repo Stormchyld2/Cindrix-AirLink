@@ -7,11 +7,13 @@ import 'package:localsend_app/model/state/server/web_share_state.dart';
 import 'package:localsend_app/provider/local_ip_provider.dart';
 import 'package:localsend_app/provider/network/server/server_provider.dart';
 import 'package:localsend_app/provider/settings_provider.dart';
+import 'package:localsend_app/util/native/direct_link.dart';
 import 'package:localsend_app/util/native/platform_check.dart';
 import 'package:localsend_app/util/ui/snackbar.dart';
 import 'package:localsend_app/widget/dialogs/pin_dialog.dart';
 import 'package:localsend_app/widget/dialogs/qr_dialog.dart';
 import 'package:localsend_app/widget/dialogs/zoom_dialog.dart';
+import 'package:localsend_app/widget/private_network_card.dart';
 import 'package:localsend_app/widget/responsive_list_view.dart';
 import 'package:localsend_isolates/util/sleep.dart';
 import 'package:logging/logging.dart';
@@ -120,6 +122,8 @@ class _WebSharePageState extends State<WebSharePage> with Refena {
           _stateEnum = _ServerState.stopping;
         });
         await sleepAsync(250);
+        // a private network started from this page must not outlive it
+        await LinkWatcher.end();
         try {
           // Also needed in the error state: the failed restart already stopped the old server.
           await _revertServerState();
@@ -182,6 +186,7 @@ class _WebSharePageState extends State<WebSharePage> with Refena {
             return ResponsiveListView(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
               children: [
+                PrivateNetworkCard(port: serverState.port, pin: pin, encrypted: _encrypted),
                 Text(t.webSharePage.openLink(n: networkState.localIps.length), style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 10),
                 Card(

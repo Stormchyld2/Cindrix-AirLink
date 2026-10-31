@@ -134,12 +134,16 @@ class LinkWatcher {
   static DateTime _startedAt = DateTime.now();
   static DateTime? _idleSince;
   static bool _sawTransfer = false;
+  static bool _keepOpen = false;
 
   /// `true` while a direct link is open.
   static final ValueNotifier<LinkMethod?> active = ValueNotifier(null);
 
-  static void begin(LinkMethod method) {
+  /// With [keepOpen] the link is not closed automatically; the caller closes it with [end] (used by "Share with anyone",
+  /// where the page serves downloads for as long as the screen is open).
+  static void begin(LinkMethod method, {bool keepOpen = false}) {
     _timer?.cancel();
+    _keepOpen = keepOpen;
     _startedAt = DateTime.now();
     _idleSince = null;
     _sawTransfer = false;
@@ -158,6 +162,7 @@ class LinkWatcher {
   static bool _isBusy(SessionStatus status) => status == SessionStatus.waiting || status == SessionStatus.sending;
 
   static void _tick() {
+    if (_keepOpen) return;
     final ref = RefenaScope.defaultRef;
     final receiving = ref.read(serverProvider)?.session;
     final sending = ref.read(sendProvider).values;

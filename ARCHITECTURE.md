@@ -158,6 +158,25 @@ Entry points: Send tab (QR icon), Receive/Home tab (primary "Pair a device" butt
   Android/Windows/MSIX/web icons from the SVGs. Launcher icons need a solid charcoal background (Android requirement);
   the wordmark and glyph PNGs are transparent.
 
+### 4.7 Share with anyone (friend has no app) — built, untested
+
+For people with neither AirLink nor LocalSend. Lives in `app/lib/widget/private_network_card.dart`, shown at the top of
+the web share page (`web_share_page.dart`, both "send via link" and "receive via link", Android only).
+
+1. "Create private network": starts the stored Wi-Fi Direct group (fallback: local-only hotspot) via the link layer.
+   The host address is the group owner IP (`192.168.49.1`) or, for the hotspot, the new IPv4 address that appears after start.
+2. **Step 1 QR** is a standard Wi-Fi code (`WIFI:T:WPA;S:<ssid>;P:<pass>;;`). Any phone camera offers "Connect".
+3. **Step 2 QR** (revealed by a button once the friend is connected) is `http://<host>:<port>` (plus `?pin=` if a PIN
+   is set); the same address is printed large for typing. The page is the existing web share server (binds `0.0.0.0`).
+4. The link is opened with `LinkWatcher.begin(..., keepOpen: true)` (no automatic timeout, because web transfers are not
+   visible to the watcher). It is closed by the "Done" button or when the share page is left.
+5. The friend-facing HTML (`packages/core/assets/web/*.html`) is rebranded and dark charcoal/blue.
+
+Why two QR codes: a camera can join a Wi-Fi network or open an address, never both in one scan, and a captive-portal
+auto-popup would need a DNS server on port 53 / web server on port 80, which Android apps cannot bind.
+Open questions: does a stock phone camera join a `DIRECT-` network (Android/Samsung/iPhone)? Does the "no internet,
+stay connected?" prompt appear and can it be answered easily? Is a transfer-complete signal available to auto-close?
+
 ## 5. Build and release
 
 - Cloud builds only (the owner does not run Flutter locally): `.github/workflows/build_cindrix_airlink.yml`.
@@ -220,8 +239,7 @@ build has been tested on real devices.**
   behaviour in particular).
 - Windows cannot scan a code, and cannot create or join Wi-Fi Direct or the hotspot. Windows API options to evaluate:
   `Windows.Devices.WiFiDirect`, and `NetworkOperatorTetheringManager` (needs an existing connection profile).
-- Sending to a friend with no app uses web share and needs a shared network; a friend's phone cannot join the Wi-Fi
-  Direct group through AirLink. A "Share with anyone" flow (Wi-Fi join QR + download QR) is a possible add-on.
+- Sending to a friend with no app: see 4.7 ("Share with anyone"); it needs real-device testing on several phone brands.
 - Only the new pairing/link screens are hard-coded English; the rest of the UI keeps LocalSend's translations (a few
   changed English strings were edited by hand in `assets/i18n/en.json` and `lib/gen/strings_en.g.dart`).
 - Android build is arm64 only; add `armeabi-v7a`/`x86_64` back only if needed (watch runner disk space).
