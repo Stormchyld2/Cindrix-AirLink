@@ -8,15 +8,16 @@ class LocalSendLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final logo = ColorFiltered(
-      colorFilter: ColorFilter.mode(
-        Theme.of(context).colorScheme.primary,
-        BlendMode.srcATop,
+    // The logo keeps its own colors: a charcoal tile with the bone arcs and blue flame.
+    final logo = Container(
+      width: 200,
+      height: 200,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1F2226),
+        borderRadius: BorderRadius.circular(46),
       ),
-      child: Assets.img.logo512.image(
-        width: 200,
-        height: 200,
-      ),
+      child: Assets.img.logo512.image(),
     );
 
     if (withText) {
