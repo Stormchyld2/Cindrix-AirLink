@@ -33,17 +33,8 @@ class AboutPage extends StatelessWidget {
           const SizedBox(height: 20),
           const LocalSendLogo(withText: true),
           Text(
-            '© ${DateTime.now().year} Tien Do Nam',
+            '© 2022-2026 Tien Do Nam (LocalSend)\nModifications © ${DateTime.now().year} Cindrix',
             textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 10),
-          Center(
-            child: TextButton(
-              onPressed: () async {
-                await launchUrl(Uri.parse('https://localsend.org'));
-              },
-              child: const Text('localsend.org'),
-            ),
           ),
           const SizedBox(height: 10),
           Text(t.aboutPage.description.join('\n\n')),
@@ -137,21 +128,15 @@ class AboutPage extends StatelessWidget {
             children: [
               TextButton(
                 onPressed: () async {
-                  await launchUrl(Uri.parse('https://localsend.org'));
+                  await launchUrl(Uri.parse('https://github.com/Stormchyld2/Cindrix-AirLink'), mode: LaunchMode.externalApplication);
                 },
-                child: const Text('Homepage'),
+                child: const Text('Source Code (Cindrix AirLink)'),
               ),
               TextButton(
                 onPressed: () async {
                   await launchUrl(Uri.parse('https://github.com/localsend/localsend'), mode: LaunchMode.externalApplication);
                 },
-                child: const Text('Source Code (Github)'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  await launchUrl(Uri.parse('https://codeberg.org/localsend/localsend'), mode: LaunchMode.externalApplication);
-                },
-                child: const Text('Source Code (Codeberg)'),
+                child: const Text('Based on LocalSend (Apache 2.0)'),
               ),
               TextButton(
                 onPressed: () async {
