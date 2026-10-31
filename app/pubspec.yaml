@@ -45,6 +45,7 @@ dependencies:
   open_file: 4.0.0
   package_info_plus: 9.0.1
   pasteboard: 0.3.0
+  mobile_scanner: ^7.0.0
   path: 1.9.1
   path_provider: 2.1.6
   path_provider_foundation: 2.6.0

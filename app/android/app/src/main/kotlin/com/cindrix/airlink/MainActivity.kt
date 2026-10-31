@@ -36,6 +36,9 @@ private const val PERMISSION_ACCESS_LOCAL_NETWORK = "android.permission.ACCESS_L
 private const val API_LEVEL_ANDROID_17 = 37
 
 class MainActivity : FlutterActivity() {
+    private val directLink by lazy { DirectLink(this) }
+    private val localHotspot by lazy { LocalHotspot(this) }
+
     private var pendingResult: MethodChannel.Result? = null
     private var pendingPermissionResult: MethodChannel.Result? = null
 
@@ -129,6 +132,19 @@ class MainActivity : FlutterActivity() {
 
                 "getDownloadsDirectory" -> {
                     result.success(getDownloadsDirectory())
+                }
+
+                "directLinkSupported" -> result.success(directLink.isSupported())
+                "directLinkStart" -> directLink.startGroup { result.success(it) }
+                "directLinkJoin" -> directLink.join(call.argument<String>("ssid")!!, call.argument<String>("passphrase")!!) { result.success(it) }
+                "directLinkStop" -> directLink.stop { result.success(null) }
+
+                "hotspotSupported" -> result.success(localHotspot.isSupported())
+                "hotspotStart" -> localHotspot.start { result.success(it) }
+                "hotspotJoin" -> localHotspot.join(call.argument<String>("ssid")!!, call.argument<String>("passphrase")!!) { result.success(it) }
+                "hotspotStop" -> {
+                    localHotspot.stop()
+                    result.success(null)
                 }
 
                 "requestLocalNetworkPermission" -> {

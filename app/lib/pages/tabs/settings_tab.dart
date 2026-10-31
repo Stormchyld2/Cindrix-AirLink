@@ -5,6 +5,7 @@ import 'package:localsend_app/gen/strings.g.dart';
 import 'package:localsend_app/model/persistence/color_mode.dart';
 import 'package:localsend_app/pages/about/about_page.dart';
 import 'package:localsend_app/pages/changelog_page.dart';
+import 'package:localsend_app/pages/pair_page.dart';
 import 'package:localsend_app/pages/settings/network_interfaces_page.dart';
 import 'package:localsend_app/pages/tabs/settings_tab_controller.dart';
 import 'package:localsend_app/provider/network/server/server_provider.dart';
@@ -530,6 +531,13 @@ class SettingsTab extends StatelessWidget {
               title: t.settingsTab.other.title,
               padding: const EdgeInsets.only(bottom: 0),
               children: [
+                _ButtonEntry(
+                  label: 'Pair a device',
+                  buttonLabel: t.general.open,
+                  onTap: () async {
+                    await context.push(() => const PairPage());
+                  },
+                ),
                 _ButtonEntry(
                   label: t.aboutPage.title,
                   buttonLabel: t.general.open,
