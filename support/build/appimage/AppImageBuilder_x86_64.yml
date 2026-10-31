@@ -3,12 +3,12 @@ version: 1
 script:
   # Workaround for error in Github Actions (https://github.com/AppImageCrafters/appimage-builder/issues/271)
   - which mksquashfs || apt install squashfs-tools
-  - install -Dm644 support/build/appimage/org.localsend.localsend_app.desktop AppDir/usr/share/applications/org.localsend.localsend_app.desktop
+  - install -Dm644 support/build/appimage/com.cindrix.airlink.desktop AppDir/usr/share/applications/com.cindrix.airlink.desktop
 
 AppDir:
   path: AppDir
   app_info:
-    id: org.localsend.localsend_app
+    id: com.cindrix.airlink
     name: LocalSend
     icon: localsend
     version: 1.18.2

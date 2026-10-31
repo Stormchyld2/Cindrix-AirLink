@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:localsend_isolates/util/content_uri_helper.dart';
 import 'package:logging/logging.dart';
 
-const _methodChannel = MethodChannel('org.localsend.localsend_app/localsend');
+const _methodChannel = MethodChannel('com.cindrix.airlink/airlink');
 final _logger = Logger('AndroidSaf');
 
 /// Scans a saved file at an absolute filesystem [path]

@@ -82,7 +82,7 @@ static void my_application_activate(GApplication* application) {
   g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
   g_autoptr(FlMethodChannel) platform_channel = fl_method_channel_new(
       fl_engine_get_binary_messenger(fl_view_get_engine(view)),
-      "org.localsend.localsend_app/platform", FL_METHOD_CODEC(codec));
+      "com.cindrix.airlink/platform", FL_METHOD_CODEC(codec));
   bool is_wayland = false;
 #ifdef GDK_WINDOWING_WAYLAND
   is_wayland = GDK_IS_WAYLAND_DISPLAY(

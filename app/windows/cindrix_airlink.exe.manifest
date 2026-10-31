@@ -3,7 +3,7 @@
   <assemblyIdentity version="0.0.0.0" name="localsendapp" />
   <msix xmlns="urn:schemas-microsoft-com:msix.v1"
           publisher="CN=Tien Do Nam, O=Tien Do Nam, L=Berlin, C=DE"
-          packageName="LocalSend.App"
+          packageName="Cindrix.AirLink"
           applicationId="localsendapp"
         />
 </assembly>

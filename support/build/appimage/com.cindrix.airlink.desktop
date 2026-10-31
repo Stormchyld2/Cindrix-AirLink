@@ -6,4 +6,4 @@ Type=Application
 Terminal=false
 Categories=Utility;
 Comment=
-StartupWMClass=org.localsend.localsend_app
+StartupWMClass=com.cindrix.airlink

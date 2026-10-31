@@ -8,7 +8,7 @@
 PRODUCT_NAME = LocalSend
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = org.localsend.localsendApp
+PRODUCT_BUNDLE_IDENTIFIER = com.cindrix.airlink
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2022-2026 Tien Do Nam

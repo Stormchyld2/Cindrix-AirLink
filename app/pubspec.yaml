@@ -1,6 +1,6 @@
 name: localsend_app
 description: An open source cross-platform alternative to AirDrop
-homepage: https://localsend.org/
+homepage: https://github.com/Stormchyld2/Cindrix-AirLink
 publish_to: "none"
 resolution: workspace
 
