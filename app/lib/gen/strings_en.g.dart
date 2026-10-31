@@ -1201,8 +1201,8 @@ class Translations$settingsTab$network$en {
   /// en: 'Use system name'
   String get useSystemName => 'Use system name';
 
-  /// en: 'Generate random alias'
-  String get generateRandomAlias => 'Generate random alias';
+  /// en: 'Generate random callsign'
+  String get generateRandomAlias => 'Generate random callsign';
 
   /// en: 'You might not be detected by other devices because you are using a custom port. (default: {defaultPort})'
   String portWarning({required Object defaultPort}) =>

@@ -1,15 +1,49 @@
 import 'dart:math';
 
-import 'package:localsend_app/gen/strings.g.dart';
+/// Military-style callsigns, e.g. "Falcon-27". Used as the default device name
+/// and by the "generate random alias" button in Settings.
+const _callsigns = [
+  'Falcon',
+  'Viper',
+  'Ranger',
+  'Raven',
+  'Wolf',
+  'Hawk',
+  'Eagle',
+  'Cobra',
+  'Titan',
+  'Ghost',
+  'Anvil',
+  'Bravo',
+  'Delta',
+  'Echo',
+  'Foxtrot',
+  'Golf',
+  'Hotel',
+  'Kilo',
+  'Lima',
+  'Mike',
+  'Oscar',
+  'Romeo',
+  'Sierra',
+  'Tango',
+  'Victor',
+  'Whiskey',
+  'Zulu',
+  'Sentry',
+  'Outpost',
+  'Relay',
+  'Warden',
+  'Vanguard',
+  'Granite',
+  'Summit',
+  'Talon',
+  'Reaper',
+];
 
 String generateRandomAlias() {
   final random = Random();
-  final adj = t.aliasGenerator.adjectives;
-  final fruits = t.aliasGenerator.fruits;
-
-  // The combination of both is locale dependent too.
-  return t.aliasGenerator.combination(
-    adjective: adj[random.nextInt(adj.length)],
-    fruit: fruits[random.nextInt(fruits.length)],
-  );
+  final name = _callsigns[random.nextInt(_callsigns.length)];
+  final number = (random.nextInt(99) + 1).toString().padLeft(2, '0');
+  return '$name-$number';
 }
