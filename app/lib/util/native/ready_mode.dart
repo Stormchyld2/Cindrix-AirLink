@@ -9,6 +9,7 @@ import 'package:localsend_app/util/native/platform_check.dart';
 import 'package:logging/logging.dart';
 import 'package:refena_flutter/refena_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 final _logger = Logger('ReadyMode');
 
@@ -30,6 +31,8 @@ class ReadyMode with WidgetsBindingObserver {
   static final ValueNotifier<bool> ready = ValueNotifier(false);
 
   static Timer? _timer;
+  static Timer? _awakeTimer;
+  static bool _awake = false;
   static bool _busy = false;
   static bool _foreground = true;
 
@@ -49,7 +52,23 @@ class ReadyMode with WidgetsBindingObserver {
       }
     });
     _timer = Timer.periodic(const Duration(seconds: 5), (_) => unawaited(evaluate()));
+    _awakeTimer = Timer.periodic(const Duration(seconds: 2), (_) => unawaited(_updateAwake()));
     unawaited(evaluate());
+  }
+
+  /// While a file is moving the screen stays on and the CPU/Wi-Fi stay awake, so a transfer is never cut off by sleep.
+  static Future<void> _updateAwake() async {
+    final busy = LinkWatcher.transferBusy;
+    if (busy == _awake) return;
+    _awake = busy;
+    await setKeepAwake(busy);
+    try {
+      if (busy) {
+        await WakelockPlus.enable();
+      } else {
+        await WakelockPlus.disable();
+      }
+    } catch (_) {}
   }
 
   static Future<void> setEnabled(bool value) async {

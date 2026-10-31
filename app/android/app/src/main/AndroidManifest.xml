@@ -3,6 +3,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <!-- Direct device-to-device links (Wi-Fi Direct / local-only hotspot) and pairing QR scanning -->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>

@@ -123,6 +123,14 @@ Future<int> directLinkClientCount() async {
   }
 }
 
+/// Holds the CPU and Wi-Fi awake (screen off included) while a transfer runs.
+Future<void> setKeepAwake(bool on) async {
+  if (!_isAndroid) return;
+  try {
+    await _channel.invokeMethod('keepAwake', {'on': on});
+  } catch (_) {}
+}
+
 Future<void> _stopNative() async {
   if (!_isAndroid) return;
   for (final name in ['directLinkStop', 'hotspotStop']) {

@@ -12,6 +12,7 @@ import android.net.wifi.p2p.WifiP2pManager
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.os.PowerManager
 import java.security.SecureRandom
 
 /**
@@ -30,6 +31,38 @@ class DirectLink(private val context: Context) {
     private var channel: WifiP2pManager.Channel? = null
     private var receiver: BroadcastReceiver? = null
     private var timeout: Runnable? = null
+
+    private var wakeLock: PowerManager.WakeLock? = null
+    private var wifiLock: WifiManager.WifiLock? = null
+
+    /**
+     * Keeps the CPU and the Wi-Fi radio running (even with the screen off) while a transfer is in progress.
+     * A safety timeout of 2 hours releases it if the app forgets to.
+     */
+    @Suppress("DEPRECATION")
+    fun setAwake(on: Boolean) {
+        if (on) {
+            if (wakeLock == null) {
+                val pm = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
+                wakeLock = pm?.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "airlink:transfer")?.apply {
+                    setReferenceCounted(false)
+                    acquire(2 * 60 * 60 * 1000L)
+                }
+            }
+            if (wifiLock == null) {
+                val wifi = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as? WifiManager
+                wifiLock = wifi?.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "airlink:transfer")?.apply {
+                    setReferenceCounted(false)
+                    acquire()
+                }
+            }
+        } else {
+            try { wakeLock?.takeIf { it.isHeld }?.release() } catch (_: Exception) {}
+            try { wifiLock?.takeIf { it.isHeld }?.release() } catch (_: Exception) {}
+            wakeLock = null
+            wifiLock = null
+        }
+    }
 
     fun isSupported(): Boolean {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
@@ -223,6 +256,7 @@ class DirectLink(private val context: Context) {
 
     /** Tears down the group or connection and frees the radio. Safe to call at any time. */
     fun stop(done: (() -> Unit)?) {
+        setAwake(false)
         timeout?.let { handler.removeCallbacks(it) }
         timeout = null
         receiver?.let {
