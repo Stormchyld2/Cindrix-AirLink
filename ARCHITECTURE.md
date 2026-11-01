@@ -322,6 +322,17 @@ Scope decided with the user: **text messages and positions only; no voice.**
   protection, solar + battery) that can also gateway to the camp Wi-Fi network / Cindrix Ops Hub.
 - Check current FCC Part 15 power and antenna-gain limits before choosing antennas.
 
+### 6.8 Ops features for check-in (planned, not built) and starter hardware list
+
+Decided with the user: people leave camp in pairs (one pair stays back so camp never drops below two). Pro features to add on top of check-in / breadcrumbs / SOS:
+
+- Scheduled check-ins: an out-pair sends "OK" at set times; camp sees who is due.
+- Overdue alert: camp's phone raises an alarm when a check-in is missed by a set time, showing the last known position.
+- Duress signal: a prearranged word or button that looks like a normal check-in but tells camp something is wrong.
+- Pair status: one map marker per pair, both names.
+
+Starter LoRa test hardware (about $105 to $135): 3 US 915 MHz boards (Heltec V3 class). One powered camp node, two walker nodes (one per pair out; a node serves a pair, since they share a phone to read messages), the spare doubling as a replacement. Ridge repeater (about $120 to $150: board, 12V LiFePO4 7Ah, 10W panel kit with LiFePO4-capable controller, 915 MHz 5.8 dBi fiberglass antenna, arrestor, 12V-to-5V USB buck converter, fuse, sealed insulated box) only after the field test shows dead spots. Keep the node box on the mast right under the antenna so radio cable stays short; run power down the mast. Match connectors (the antenna cable is probably SMA, the chosen arrestor is N-type). Mast near a ridge, away from power lines, grounded.
+
 ## 7. Known limitations and open questions
 
 - Nothing in sections 4.2–4.4 has run on a real device yet; expect model-specific fixes (Samsung Wi-Fi Direct
