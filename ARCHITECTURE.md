@@ -194,6 +194,26 @@ stay connected?" prompt appear and can it be answered easily? Is a transfer-comp
 - Known upstream leftovers: the Linux/macOS/iOS projects, `cli/`, `server/` and the Rust crate/Dart package names
   (`localsend_app`, `localsend_isolates`) are intentionally unchanged to keep the protocol and merges simple.
 
+## 5.5 Two products, one codebase: AirLink and AirLink Pro
+
+Plain AirLink (file transfer only) and AirLink Pro (adds Comms, once built) are built from this one repository
+as two Android product flavors (`app/android/app/build.gradle`, `flavorDimensions = ["tier"]`):
+
+- `free` — applicationId `com.cindrix.airlink` (unchanged from every build so far).
+- `pro` — applicationId `com.cindrix.airlink.pro`, app name "Cindrix AirLink Pro".
+
+The Dart side reads a matching `--dart-define=TIER=pro|free` (`lib/config/tier.dart`, `isPro` / `productName`);
+undefined defaults to `free`, so an unflavored build behaves exactly as every build before this one did.
+`lib/pages/home_page.dart`'s `visibleHomeTabs` hides the Comms tab (`lib/pages/tabs/comms_tab.dart`, currently a
+placeholder) unless `isPro`. CI (`build_cindrix_airlink.yml`) builds both flavors from the same Android job and
+uploads them as separate artifacts (`CindrixAirLink-*-android`, `CindrixAirLinkPro-*-android`); both are signed
+with the same key, so they can install side by side on one phone for testing. This doubles the Android build's
+CI minutes — free while the repo is public, worth remembering if it goes private again.
+
+Everything except Comms (pairing, Wi-Fi Direct, Ready mode, Share with anyone, the UI) stays one shared
+codebase, so a fix made once applies to both products and they can never drift out of protocol compatibility
+with each other.
+
 ## 6. One-tap "Ready" mode (Android ↔ Android) — phase 1 built, untested
 
 Phase 1 (built): `util/native/ready_mode.dart` starts the stored Wi-Fi Direct group when there is no real network (addresses in

@@ -50,6 +50,21 @@ android {
         versionName flutterVersionName
     }
 
+    // Two products from one codebase: plain AirLink (file transfer only) and AirLink Pro (adds Comms).
+    // Dart side reads the matching value via --dart-define=TIER=pro (see lib/config/tier.dart);
+    // defaults to "free" so an unflavored `flutter build` behaves exactly as before.
+    flavorDimensions = ["tier"]
+    productFlavors {
+        free {
+            dimension "tier"
+            // keeps the existing applicationId, so this is a drop-in replacement for every APK built so far
+        }
+        pro {
+            dimension "tier"
+            applicationIdSuffix ".pro"
+        }
+    }
+
     signingConfigs {
         release {
             def keystoreProperties = new Properties()
