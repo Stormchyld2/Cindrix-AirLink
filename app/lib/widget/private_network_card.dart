@@ -242,8 +242,10 @@ class _PrivateNetworkCardState extends State<PrivateNetworkCard> {
                 _stepTitle(context, '2', 'Get the file'),
                 const SizedBox(height: 6),
                 Text(
-                  'Now point the camera at this second code. It opens a page with the download button. '
-                  'If the browser warns the page is "not private", tap Advanced, then Continue. That is normal on a private network.',
+                  widget.encrypted
+                      ? 'Now point the camera at this second code. It opens a page with the download button. '
+                            'If the browser warns the page is "not private", tap Advanced, then Continue. That is normal on a private network.'
+                      : 'Now point the camera at this second code. It opens a page with the download button.',
                   style: theme.textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 10),

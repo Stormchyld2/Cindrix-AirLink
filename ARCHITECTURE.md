@@ -167,7 +167,7 @@ the web share page (`web_share_page.dart`, both "send via link" and "receive via
    The host address is the group owner IP (`192.168.49.1`) or, for the hotspot, the new IPv4 address that appears after start.
 2. **Step 1 QR** is a standard Wi-Fi code (`WIFI:T:WPA;S:<ssid>;P:<pass>;;`). Any phone camera offers "Connect".
 3. **Step 2 QR** (revealed automatically when `requestGroupInfo` reports a client in the Wi-Fi Direct group, polled every 2 s;
-   a button is the fallback, e.g. for the hotspot) is `https://<host>:<port>` (encryption is the default; the browser shows a
+   a button is the fallback, e.g. for the hotspot) is `https://<host>:<port>` (encryption is off by default, a checkbox turns it on; then the browser shows a
    "not private" warning that the step text explains) (plus `?pin=` if a PIN
    is set); the same address is printed large for typing. The page is the existing web share server (binds `0.0.0.0`).
    Downloads are auto-accepted for this flow (a friend with no app cannot be approved on the sender's phone by hand).
