@@ -197,12 +197,12 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           if [ "${{ steps.flavors.outputs.free }}" = "true" ]; then
             NAME="app-airlink-${VERSION}-release.apk"
-            cp "app/build/app/outputs/flutter-apk/app-free-arm64-v8a-release.apk" "app/build/app/outputs/flutter-apk/${NAME}"
+            cp "app/build/app/outputs/flutter-apk/app-arm64-v8a-free-release.apk" "app/build/app/outputs/flutter-apk/${NAME}"
             echo "free_path=app/build/app/outputs/flutter-apk/${NAME}" >> "$GITHUB_OUTPUT"
           fi
           if [ "${{ steps.flavors.outputs.pro }}" = "true" ]; then
             NAME="app-airlink-pro-${VERSION}-release.apk"
-            cp "app/build/app/outputs/flutter-apk/app-pro-arm64-v8a-release.apk" "app/build/app/outputs/flutter-apk/${NAME}"
+            cp "app/build/app/outputs/flutter-apk/app-arm64-v8a-pro-release.apk" "app/build/app/outputs/flutter-apk/${NAME}"
             echo "pro_path=app/build/app/outputs/flutter-apk/${NAME}" >> "$GITHUB_OUTPUT"
           fi
 
