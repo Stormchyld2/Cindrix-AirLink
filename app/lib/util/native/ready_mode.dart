@@ -36,6 +36,9 @@ class ReadyMode with WidgetsBindingObserver {
   static bool _busy = false;
   static bool _foreground = true;
 
+  /// Set by BackgroundMode: true while the stay-ready foreground service keeps the app alive.
+  static bool Function() backgroundAllowed = () => false;
+
   static bool get _supported => checkPlatform([TargetPlatform.android]);
 
   static Future<void> init() async {
@@ -88,7 +91,8 @@ class ReadyMode with WidgetsBindingObserver {
   /// Starts or stops Ready so that it matches the current situation.
   static Future<void> evaluate() async {
     if (!_supported || _busy) return;
-    final shouldRun = enabled.value && _foreground && !_hasRealNetwork();
+    // in the background only while AirLink Pro's stay-ready service is running (BackgroundMode)
+    final shouldRun = enabled.value && (_foreground || backgroundAllowed()) && !_hasRealNetwork();
 
     if (!shouldRun) {
       if (ready.value && !LinkWatcher.transferBusy) {

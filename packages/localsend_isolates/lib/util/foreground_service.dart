@@ -27,6 +27,14 @@ class ForegroundService {
   static String? _lastTitle;
   static String? _lastText;
 
+  /// AirLink Pro's "stay ready" notification. While set, the service is never stopped by [stop] (a finished
+  /// transfer would otherwise take Ready mode and Comms down with it); [stop] just restores this text.
+  static String? _persistentTitle;
+  static String? _persistentText;
+
+  /// Whether a persistent (stay-ready) notification is requested.
+  static bool get isPersistent => _persistentTitle != null;
+
   /// The service exists on Android only. On iOS the app keeps running in the background anyway,
   /// and on desktop there is nothing to keep alive.
   static bool get _isSupported => defaultTargetPlatform == TargetPlatform.android;
@@ -70,7 +78,9 @@ class ForegroundService {
 
       final result = await FlutterForegroundTask.startService(
         serviceId: _serviceId,
-        serviceTypes: const [ForegroundServiceTypes.dataSync],
+        // A persistent (stay-ready) service is not a data transfer: connectedDevice has no Android 15 time limit,
+        // dataSync does (6 h per day).
+        serviceTypes: isPersistent ? const [ForegroundServiceTypes.connectedDevice] : const [ForegroundServiceTypes.dataSync],
         notificationTitle: title,
         notificationText: text,
       );
@@ -84,6 +94,37 @@ class ForegroundService {
 
       _running = true;
     });
+  }
+
+  /// Keeps the service running (until [stopPersistent]) with a fixed notification. Used by AirLink Pro so
+  /// Ready mode and Comms survive the screen turning off or the app being backgrounded.
+  /// Must be called while the app is in the foreground (Android 12+).
+  static void startPersistent({required String channelName, required String title, required String text}) {
+    if (!_isSupported) {
+      return;
+    }
+    final wasPersistent = isPersistent;
+    _persistentTitle = title;
+    _persistentText = text;
+    if (_running) {
+      if (wasPersistent) {
+        // only a text change; bypass the throttle
+        _lastUpdate = null;
+      }
+      updateNotification(title: title, text: text);
+      return;
+    }
+    start(channelName: channelName, title: title, text: text);
+  }
+
+  /// Ends the stay-ready request and stops the service (an active transfer's own notification is replaced; it re-registers on its next update).
+  static void stopPersistent() {
+    if (!_isSupported || !isPersistent) {
+      return;
+    }
+    _persistentTitle = null;
+    _persistentText = null;
+    stop();
   }
 
   /// Updates the notification.
@@ -124,6 +165,17 @@ class ForegroundService {
   /// Stops the service and removes the notification. Does nothing if it is not running.
   static void stop() {
     if (!_isSupported) {
+      return;
+    }
+
+    final title = _persistentTitle;
+    final text = _persistentText;
+    if (title != null && text != null) {
+      // stay-ready is on: go back to its notification instead of stopping
+      _lastUpdate = null;
+      _lastTitle = null;
+      _lastText = null;
+      updateNotification(title: title, text: text);
       return;
     }
 

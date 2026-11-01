@@ -34,6 +34,12 @@
          FOREGROUND_SERVICE and POST_NOTIFICATIONS come from the flutter_foreground_task manifest. -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
+    <!-- AirLink Pro stay-ready service (Wi-Fi Direct group + Comms while the screen is off). connectedDevice has no
+         Android 15 runtime limit; it requires CHANGE_WIFI_STATE / NEARBY_WIFI_DEVICES, declared above. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+    <!-- Lets the user exempt AirLink Pro from battery optimisation so Samsung/Doze do not kill it. -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
     <!-- Android TV -->
     <uses-feature android:name="android.software.leanback" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
@@ -104,7 +110,7 @@
              Warning: the name is defined by flutter_foreground_task and must not be changed. -->
         <service
             android:name="com.pravera.flutter_foreground_task.service.ForegroundService"
-            android:foregroundServiceType="dataSync"
+            android:foregroundServiceType="dataSync|connectedDevice"
             android:exported="false" />
 
         <!-- Don't delete the meta-data below.

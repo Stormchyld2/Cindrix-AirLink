@@ -14,9 +14,9 @@ name: Build Cindrix AirLink (Windows + Android)
 # only builds Android. "Run workflow" lets you pick Windows, Android, or both.
 #
 # Android builds two products from one codebase (see ARCHITECTURE.md 5.5): plain AirLink and AirLink Pro.
-# "Run workflow" lets you pick either or both. A push to "build" builds both by default, unless you set the
-# repository variable AIRLINK_FLAVOR to "free" or "pro" (Settings > Secrets and variables > Actions > Variables)
-# to build only the one you're currently working on - cuts Android build time roughly in half.
+# "Run workflow" lets you pick either or both. A push to "build" builds Pro only by default, unless you set the
+# repository variable AIRLINK_FLAVOR to "free" or "both". Plain AirLink is finished, so the default is now
+# AirLink Pro only (roughly half the build time).
 on:
   workflow_dispatch:
     inputs:
@@ -29,9 +29,9 @@ on:
         type: boolean
         default: true
       android_free:
-        description: "Android: build plain AirLink"
+        description: "Android: build plain AirLink (finished, off by default)"
         type: boolean
-        default: true
+        default: false
       android_pro:
         description: "Android: build AirLink Pro"
         type: boolean
@@ -128,7 +128,8 @@ jobs:
             case "${{ vars.AIRLINK_FLAVOR }}" in
               free) FREE=true; PRO=false ;;
               pro) FREE=false; PRO=true ;;
-              *) FREE=true; PRO=true ;;
+              both) FREE=true; PRO=true ;;
+              *) FREE=false; PRO=true ;;
             esac
           fi
           echo "free=$FREE" >> "$GITHUB_OUTPUT"

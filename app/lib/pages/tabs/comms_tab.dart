@@ -1,16 +1,11 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:localsend_app/comms/chat_thread_page.dart';
-import 'package:localsend_app/comms/comms_sync.dart';
 import 'package:localsend_app/comms/message.dart';
 import 'package:localsend_app/comms/message_store.dart';
 import 'package:localsend_app/config/theme.dart';
 import 'package:localsend_app/model/persistence/favorite_device.dart';
-import 'package:localsend_app/provider/device_info_provider.dart';
 import 'package:localsend_app/provider/favorites_provider.dart';
-import 'package:localsend_app/provider/network/nearby_devices_provider.dart';
 import 'package:refena_flutter/refena_flutter.dart';
 
 /// AirLink Pro's Comms: a mailbox between paired phones. Each contact is a paired favorite; messages queue
@@ -24,8 +19,6 @@ class CommsTab extends StatefulWidget {
 }
 
 class _CommsTabState extends State<CommsTab> with Refena {
-  Timer? _ambientSync;
-
   @override
   void initState() {
     super.initState();
@@ -35,33 +28,13 @@ class _CommsTabState extends State<CommsTab> with Refena {
       if (mounted) setState(() {});
     });
 
-    // While this tab is open, opportunistically flush any queued mail to a paired contact the moment
-    // normal LAN/discovery already sees them nearby — not everything has to wait for a deliberate
-    // quickConnect tap.
-    _ambientSync = Timer.periodic(const Duration(seconds: 5), (_) => unawaited(_flushToNearbyContacts()));
+    // Queued mail to nearby contacts is flushed by BackgroundMode's timer (also with the screen off).
   }
 
   @override
   void dispose() {
-    _ambientSync?.cancel();
     CommsMessageStore.instance.removeListener(_onStoreChanged);
     super.dispose();
-  }
-
-  Future<void> _flushToNearbyContacts() async {
-    final nearby = ref.read(nearbyDevicesProvider).allDevices.values;
-    if (nearby.isEmpty) return;
-    final favorites = ref.read(favoritesProvider);
-    final myFingerprint = ref.read(deviceFullInfoProvider).fingerprint;
-
-    for (final device in nearby) {
-      final ip = device.ip;
-      if (ip == null) continue;
-      final isFavorite = favorites.any((f) => f.fingerprint == device.fingerprint);
-      if (!isFavorite) continue;
-      if (CommsMessageStore.instance.pendingOutboundFor(device.fingerprint).isEmpty) continue;
-      await deliverPendingTo(myFingerprint: myFingerprint, contactFingerprint: device.fingerprint, ip: ip);
-    }
   }
 
   void _onStoreChanged() {

@@ -18,6 +18,7 @@ import 'package:localsend_app/util/native/device_info_helper.dart';
 import 'package:localsend_app/util/native/macos_channel.dart';
 import 'package:localsend_app/util/native/pick_directory_path.dart';
 import 'package:localsend_app/util/native/platform_check.dart';
+import 'package:localsend_app/util/native/background_mode.dart';
 import 'package:localsend_app/util/native/ready_mode.dart';
 import 'package:localsend_app/widget/custom_dropdown_button.dart';
 import 'package:localsend_app/widget/dialogs/encryption_disabled_notice.dart';
@@ -542,6 +543,25 @@ class SettingsTab extends StatelessWidget {
                       onChanged: (value) => ReadyMode.setEnabled(value),
                     ),
                   ),
+                if (BackgroundMode.supported) ...[
+                  ValueListenableBuilder<bool>(
+                    valueListenable: BackgroundMode.enabled,
+                    builder: (context, enabled, _) => _BooleanEntry(
+                      label: 'Stay ready in background',
+                      description: 'Keeps AirLink Pro running with the screen off, with a notification. Needed for Comms and Ready mode when the app is not open.',
+                      value: enabled,
+                      onChanged: (value) => BackgroundMode.setEnabled(value),
+                    ),
+                  ),
+                  ValueListenableBuilder<bool>(
+                    valueListenable: BackgroundMode.batteryExempt,
+                    builder: (context, exempt, _) => _ButtonEntry(
+                      label: 'Battery: ${exempt ? 'unrestricted' : 'may be stopped by Android'}',
+                      buttonLabel: exempt ? t.general.open : 'Allow',
+                      onTap: () async => await BackgroundMode.requestBatteryExemption(),
+                    ),
+                  ),
+                ],
                 _ButtonEntry(
                   label: 'Pair a device',
                   buttonLabel: t.general.open,

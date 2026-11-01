@@ -296,6 +296,17 @@ Not yet built: push-to-talk, location/check-in/start-point/breadcrumbs, the back
 messages arrive without AirLink open on both ends (same unsolved piece as Ready mode phase 2), the SOS
 screen/quick-tile/widget, the home-screen tile redesign, and hardening the comms channel's sender identity.
 
+### 6.6 Background service (AirLink Pro)
+
+`util/native/background_mode.dart` + `ForegroundService.startPersistent` (packages/localsend_isolates). While the
+"Stay ready in background" setting is on (default), Pro runs an Android foreground service (type `connectedDevice`,
+no Android 15 time limit) with a standby notification. It is started whenever the app is visible (Android 12+ forbids
+starting one from the background) and then keeps running with the screen off. While it runs, `ReadyMode` no longer
+stops in the background, and a 5 s timer flushes queued Comms mail to paired contacts discovery can see. A finished
+file transfer restores the standby notification instead of stopping the service. Settings also offers the
+battery-optimisation exemption (needed on Samsung). Limits: swiping the app out of recents kills the process (and
+the service); starting the app from the background after a reboot is not done yet. Not verified on-device yet.
+
 ## 7. Known limitations and open questions
 
 - Nothing in sections 4.2–4.4 has run on a real device yet; expect model-specific fixes (Samsung Wi-Fi Direct

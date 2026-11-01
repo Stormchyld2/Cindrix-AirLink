@@ -14,6 +14,7 @@ import 'package:localsend_app/pages/tabs/receive_tab.dart';
 import 'package:localsend_app/pages/tabs/send_tab.dart';
 import 'package:localsend_app/pages/tabs/settings_tab.dart';
 import 'package:localsend_app/provider/selection/selected_sending_files_provider.dart';
+import 'package:localsend_app/util/native/background_mode.dart';
 import 'package:localsend_app/util/native/cross_file_converters.dart';
 import 'package:localsend_app/util/native/ready_mode.dart';
 import 'package:localsend_app/widget/responsive_builder.dart';
@@ -94,6 +95,7 @@ class _HomePageState extends State<HomePage> with Refena {
       if (isPro) {
         await CommsMessageStore.instance.ensureLoaded();
         await CommsServer.start();
+        await BackgroundMode.init();
       }
     });
   }
