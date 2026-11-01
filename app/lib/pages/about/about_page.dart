@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:localsend_app/config/tier.dart';
 import 'package:localsend_app/gen/strings.g.dart';
 import 'package:localsend_app/pages/debug/debug_page.dart';
 import 'package:localsend_app/util/i18n.dart';
@@ -25,7 +26,7 @@ class AboutPage extends StatelessWidget {
     final primaryColor = Theme.of(context).colorScheme.primary;
     return Scaffold(
       appBar: AppBar(
-        title: Text(t.aboutPage.title),
+        title: const Text('About $productName'),
       ),
       body: ResponsiveListView(
         padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -33,7 +34,7 @@ class AboutPage extends StatelessWidget {
           const SizedBox(height: 20),
           const LocalSendLogo(withText: true),
           Text(
-            '© 2022-2026 Tien Do Nam (LocalSend)\nModifications © ${DateTime.now().year} Cindrix',
+            '© 2022-2026 Tien Do Nam (LocalSend)\nModifications © 2026 Cindrix Development',
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 10),

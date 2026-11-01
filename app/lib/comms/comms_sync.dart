@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:localsend_app/comms/comms_server.dart';
 import 'package:localsend_app/comms/message_store.dart';
 import 'package:localsend_app/provider/device_info_provider.dart';
-import 'package:localsend_app/provider/favorites_provider.dart';
 import 'package:localsend_app/provider/network/nearby_devices_provider.dart';
 import 'package:logging/logging.dart';
 import 'package:refena_flutter/refena_flutter.dart';
@@ -52,13 +51,11 @@ Future<void> flushCommsToNearby(Ref ref) async {
   if (CommsMessageStore.instance.pendingOutbound.isEmpty) return;
   final nearby = ref.read(nearbyDevicesProvider).allDevices.values;
   if (nearby.isEmpty) return;
-  final favorites = ref.read(favoritesProvider);
   final myFingerprint = ref.read(deviceFullInfoProvider).fingerprint;
 
   for (final device in nearby) {
     final ip = device.ip;
     if (ip == null) continue;
-    if (!favorites.any((f) => f.fingerprint == device.fingerprint)) continue;
     if (CommsMessageStore.instance.pendingOutboundFor(device.fingerprint).isEmpty) continue;
     await deliverPendingTo(myFingerprint: myFingerprint, contactFingerprint: device.fingerprint, ip: ip);
   }

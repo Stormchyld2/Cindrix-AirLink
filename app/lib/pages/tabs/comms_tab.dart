@@ -5,7 +5,9 @@ import 'package:localsend_app/comms/message.dart';
 import 'package:localsend_app/comms/message_store.dart';
 import 'package:localsend_app/config/theme.dart';
 import 'package:localsend_app/model/persistence/favorite_device.dart';
+import 'package:localsend_app/provider/device_info_provider.dart';
 import 'package:localsend_app/provider/favorites_provider.dart';
+import 'package:localsend_app/provider/network/nearby_devices_provider.dart';
 import 'package:refena_flutter/refena_flutter.dart';
 
 /// AirLink Pro's Comms: a mailbox between paired phones. Each contact is a paired favorite; messages queue
@@ -44,7 +46,18 @@ class _CommsTabState extends State<CommsTab> with Refena {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final favorites = context.watch(favoritesProvider);
+    final saved = context.watch(favoritesProvider);
+    final nearby = context.watch(nearbyDevicesProvider).allDevices.values;
+    final myFingerprint = context.watch(deviceFullInfoProvider).fingerprint;
+
+    // Contacts = paired phones plus any AirLink phone currently visible (Romeo-95 on the same network, say),
+    // because messages are addressed by fingerprint and do not need a stored pairing.
+    final favorites = <FavoriteDevice>[...saved];
+    for (final device in nearby) {
+      if (device.fingerprint.isEmpty || device.fingerprint == myFingerprint) continue;
+      if (favorites.any((f) => f.fingerprint == device.fingerprint)) continue;
+      favorites.add(FavoriteDevice.fromValues(fingerprint: device.fingerprint, ip: device.ip ?? '', port: device.port, alias: device.alias));
+    }
 
     if (favorites.isEmpty) {
       return Center(
@@ -58,7 +71,7 @@ class _CommsTabState extends State<CommsTab> with Refena {
               Text('COMMS', style: TextStyle(fontFamily: airLinkHeadingFont, fontSize: 28, fontWeight: FontWeight.w700, letterSpacing: 2)),
               const SizedBox(height: 10),
               const Text(
-                'Pair a device first (Settings → Pair a device). Each paired phone becomes a Comms contact.',
+                'No contacts yet. Tap "Pair a device" on the main screen (Receive tab), or open AirLink Pro on a nearby phone: every phone AirLink can see shows up here.',
                 textAlign: TextAlign.center,
               ),
             ],

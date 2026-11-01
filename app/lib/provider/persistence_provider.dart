@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:localsend_app/config/tier.dart';
 import 'package:localsend_app/gen/strings.g.dart';
 import 'package:localsend_app/model/persistence/color_mode.dart';
 import 'package:localsend_app/model/persistence/favorite_device.dart';
@@ -492,7 +493,8 @@ class PersistenceService {
   }
 
   bool isHttps() {
-    return _prefs.getBool(_https) ?? true;
+    // AirLink Pro: encryption off by default (the user's call); plain AirLink keeps the original default.
+    return _prefs.getBool(_https) ?? !isPro;
   }
 
   Future<void> setHttps(bool https) async {

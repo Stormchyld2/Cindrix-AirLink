@@ -3,7 +3,12 @@ import 'package:intl/intl.dart';
 import 'package:localsend_app/comms/message.dart';
 import 'package:localsend_app/comms/message_store.dart';
 import 'package:localsend_app/model/persistence/favorite_device.dart';
+import 'package:localsend_app/comms/comms_sync.dart';
+import 'package:localsend_app/provider/device_info_provider.dart';
+import 'package:localsend_app/provider/network/nearby_devices_provider.dart';
+import 'package:localsend_app/util/native/direct_link.dart';
 import 'package:localsend_app/util/native/quick_connect.dart';
+import 'package:localsend_app/util/ui/snackbar.dart';
 import 'package:refena_flutter/refena_flutter.dart';
 
 /// One contact's conversation: send a text now (it queues and sends the moment the link is up), see what's
@@ -48,11 +53,20 @@ class _ChatThreadPageState extends State<ChatThreadPage> with Refena {
 
     await CommsMessageStore.instance.queueText(contactFingerprint: widget.favorite.fingerprint, text: text);
 
-    // Try to deliver right now: if the contact is already linked (Ready mode, or we're mid-send to them),
-    // this flushes instantly instead of waiting for the next time quickConnect runs. quickConnect flushes
-    // the outbox itself on success; on failure the message simply stays queued for later.
-    if (mounted) {
-      await quickConnect(context, ref, widget.favorite);
+    // Try to deliver right now. First straight to the phone if discovery already sees it (same network, or
+    // already linked); otherwise join its stored direct link (Ready mode). Whatever fails stays queued.
+    final fingerprint = widget.favorite.fingerprint;
+    final myFingerprint = ref.read(deviceFullInfoProvider).fingerprint;
+    final visible = ref.read(nearbyDevicesProvider).allDevices.values.where((d) => d.fingerprint == fingerprint && d.ip != null);
+    if (visible.isNotEmpty) {
+      await deliverPendingTo(myFingerprint: myFingerprint, contactFingerprint: fingerprint, ip: visible.first.ip!);
+    }
+    if (mounted && CommsMessageStore.instance.pendingOutboundFor(fingerprint).isNotEmpty) {
+      if (await LinkStore.find(fingerprint) != null) {
+        if (mounted) await quickConnect(context, ref, widget.favorite);
+      } else if (mounted) {
+        context.showSnackBar('Queued. ${widget.favorite.alias} is not reachable right now and has no saved direct link; it will send when they appear.');
+      }
     }
 
     if (mounted) setState(() => _sending = false);
