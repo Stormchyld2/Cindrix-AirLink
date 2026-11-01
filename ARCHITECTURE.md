@@ -307,6 +307,21 @@ file transfer restores the standby notification instead of stopping the service.
 battery-optimisation exemption (needed on Samsung). Limits: swiping the app out of recents kills the process (and
 the service); starting the app from the background after a reboot is not done yet. Not verified on-device yet.
 
+### 6.7 Phase LoRa (planned, not built)
+
+Long-range Comms for AirLink Pro over LoRa radio boards (ESP32, 915 MHz US) paired to the phone by Bluetooth.
+Scope decided with the user: **text messages and positions only; no voice.**
+
+- Step 0: field-test two or three stock Meshtastic boards at real distances before writing anything.
+- Positions are sent as compact packets (id, lat, lon, time, status such as OK/distress, about 20 bytes), not GPX
+  files: LoRa carries about 1 kbps and a few hundred bytes per packet. Each phone rebuilds a labelled, timestamped
+  GPX waypoint locally, so the map viewer still reads ordinary GPX.
+- Own firmware on the boards (RadioLib, MIT) with our own phone protocol, so Pro stays closed-source. Meshtastic's
+  firmware, app and protocol definitions are GPL: do not copy them into Pro. Check licences first.
+- Roles: portable node, and a base-camp repeater (high 915 MHz omni antenna, short low-loss coax, lightning
+  protection, solar + battery) that can also gateway to the camp Wi-Fi network / Cindrix Ops Hub.
+- Check current FCC Part 15 power and antenna-gain limits before choosing antennas.
+
 ## 7. Known limitations and open questions
 
 - Nothing in sections 4.2–4.4 has run on a real device yet; expect model-specific fixes (Samsung Wi-Fi Direct
