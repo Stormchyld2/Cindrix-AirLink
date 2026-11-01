@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:localsend_app/comms/comms_sync.dart';
+import 'package:localsend_app/config/tier.dart';
 import 'package:localsend_app/model/pairing_payload.dart';
 import 'package:localsend_app/model/persistence/favorite_device.dart';
 import 'package:localsend_app/provider/device_info_provider.dart';
@@ -47,6 +51,13 @@ Future<Device?> quickConnect(BuildContext context, Ref ref, FavoriteDevice favor
         payload: me,
       );
       await ref.redux(favoritesProvider).dispatchAsync(UpdateFavoriteAction(favorite.copyWith(ip: ip)));
+      if (isPro) {
+        // We're actually reachable now; flush anything queued for this contact. Fire-and-forget: the send
+        // this call was for should not wait on comms delivery.
+        unawaited(
+          deliverPendingTo(myFingerprint: ref.read(deviceFullInfoProvider).fingerprint, contactFingerprint: favorite.fingerprint, ip: ip),
+        );
+      }
       return response.body.toDevice(ip, favorite.port, https);
     } catch (_) {
       await Future<void>.delayed(const Duration(seconds: 1));

@@ -263,6 +263,39 @@ build has been tested on real devices.**
 - `send_tab_vm.dart` / favorite tap path: call a new `ensureReachable(favorite)` before sending.
 - Native: optional foreground service in Kotlin plus manifest entries; no change to the wire protocol.
 
+## 6.5 Comms (AirLink Pro only) — text working, built, untested on real devices
+
+Scope locked in with the owner: text + push-to-talk (PTT not built yet), mailbox/store-and-forward,
+**direct-only** (a message only delivers once the two specific phones are linked again — no relay through a
+third paired phone; that would be real mesh routing, a different, much bigger project). Group chat is out of
+scope for v1. Location sharing (check-in, start point, breadcrumbs, writing into the shared GPX file the map
+viewer reads) is planned but not yet built, sequenced after text + PTT are proven.
+
+Deliberately **not** built on the Rust/FRB file-transfer protocol — a second, pure-Dart channel instead
+(`lib/comms/comms_server.dart`, port 53318, one endpoint), so Comms can be built and changed without ever
+touching the FRB-generated bridge or Rust core. Its security model is weaker than pairing's (it trusts the
+`from` fingerprint a message claims, rather than binding to a TLS client cert); the real protection today is
+the same one "Share with anyone" relies on — only someone who has the Wi-Fi Direct password can reach the
+port at all. Worth hardening (pin the sender's cert) before treating this as safe against anyone deliberately
+hostile already on the link.
+
+- `lib/comms/message.dart` — `CommsMessage` (text/audio/location, pending/delivered, read flag).
+- `lib/comms/message_store.dart` — `CommsMessageStore`, a singleton `ChangeNotifier` backed by one
+  newline-delimited-JSON file in app-private storage (`getApplicationSupportDirectory()`), loaded once.
+- `lib/comms/comms_server.dart` — the Dart `HttpServer` listener (`/comms/deliver`), started/stopped in
+  `home_page.dart`'s `initState`/`dispose` when `isPro`.
+- `lib/comms/comms_sync.dart` — `deliverPendingTo(...)`, POSTs a contact's queued outbox to their IP.
+  Called (a) from `quick_connect.dart`'s `quickConnect` right after a successful register, so a deliberate
+  connect always flushes mail, and (b) every 5s from `pages/tabs/comms_tab.dart` while that tab is open,
+  against whatever `nearbyDevicesProvider` already sees, so delivery also happens ambiently on ordinary LAN
+  discovery, not only via quickConnect.
+- `lib/pages/tabs/comms_tab.dart` / `lib/comms/chat_thread_page.dart` — contact list (favorites, sorted by
+  last message, unread badges) and the thread itself (text input, bubbles, pending/delivered ticks).
+
+Not yet built: push-to-talk, location/check-in/start-point/breadcrumbs, the background service that would let
+messages arrive without AirLink open on both ends (same unsolved piece as Ready mode phase 2), the SOS
+screen/quick-tile/widget, the home-screen tile redesign, and hardening the comms channel's sender identity.
+
 ## 7. Known limitations and open questions
 
 - Nothing in sections 4.2–4.4 has run on a real device yet; expect model-specific fixes (Samsung Wi-Fi Direct

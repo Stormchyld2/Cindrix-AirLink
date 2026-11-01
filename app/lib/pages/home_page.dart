@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
+import 'package:localsend_app/comms/comms_server.dart';
+import 'package:localsend_app/comms/message_store.dart';
 import 'package:localsend_app/config/init.dart';
 import 'package:localsend_app/config/theme.dart';
 import 'package:localsend_app/config/tier.dart';
@@ -89,7 +91,20 @@ class _HomePageState extends State<HomePage> with Refena {
       ref.redux(homePageControllerProvider).dispatch(ChangeTabAction(widget.initialTab));
       await postInit(context, ref, widget.appStart);
       await ReadyMode.init();
+      if (isPro) {
+        await CommsMessageStore.instance.ensureLoaded();
+        await CommsServer.start();
+      }
     });
+  }
+
+  @override
+  void dispose() {
+    if (isPro) {
+      // ignore: discarded_futures
+      CommsServer.stop();
+    }
+    super.dispose();
   }
 
   @override
