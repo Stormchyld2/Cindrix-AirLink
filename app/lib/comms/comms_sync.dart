@@ -25,7 +25,7 @@ Future<void> deliverPendingTo({required String myFingerprint, required String co
       try {
         final request = await client.post(ip, CommsServer.port, '/comms/deliver');
         request.headers.contentType = ContentType.json;
-        request.write(jsonEncode(message.toWire(myFingerprint)));
+        request.write(jsonEncode(message.toWire(myFingerprint, myAlias: RefenaScope.defaultRef.read(deviceFullInfoProvider).alias)));
         final response = await request.close().timeout(const Duration(seconds: 5));
         await response.drain<void>();
         if (response.statusCode == HttpStatus.ok) {

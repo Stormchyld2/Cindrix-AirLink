@@ -51,6 +51,7 @@ class CommsServer {
       final json = jsonDecode(body) as Map<String, dynamic>;
       final message = CommsMessage.fromWire(json);
       await CommsMessageStore.instance.receive(message);
+      await CommsMessageStore.instance.rememberContact(message.contactFingerprint, (json['fromAlias'] as String?) ?? '');
       request.response.statusCode = HttpStatus.ok;
     } catch (e) {
       _logger.warning('Dropped a malformed comms delivery', e);

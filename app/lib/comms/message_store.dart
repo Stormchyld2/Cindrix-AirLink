@@ -21,7 +21,28 @@ class CommsMessageStore extends ChangeNotifier {
   CommsMessageStore._();
 
   final List<CommsMessage> _messages = [];
+  final Map<String, String> _contacts = {}; // fingerprint -> alias, everyone we have exchanged mail with
   bool _loaded = false;
+
+  /// Phones we have messaged or heard from, kept across restarts so a contact does not vanish when it is out of
+  /// range or the app was closed. Returned as fingerprint -> alias.
+  Map<String, String> get knownContacts => Map.unmodifiable(_contacts);
+
+  Future<File> _contactsFile() async {
+    final dir = await getApplicationSupportDirectory();
+    return File(p.join(dir.path, 'comms_contacts.json'));
+  }
+
+  Future<void> rememberContact(String fingerprint, String alias) async {
+    if (fingerprint.isEmpty || alias.isEmpty || _contacts[fingerprint] == alias) return;
+    _contacts[fingerprint] = alias;
+    notifyListeners();
+    try {
+      await (await _contactsFile()).writeAsString(jsonEncode(_contacts));
+    } catch (e) {
+      _logger.warning('Could not save comms contacts', e);
+    }
+  }
 
   List<CommsMessage> get all => List.unmodifiable(_messages);
 
@@ -33,6 +54,15 @@ class CommsMessageStore extends ChangeNotifier {
   Future<void> ensureLoaded() async {
     if (_loaded) return;
     _loaded = true;
+    try {
+      final contactsFile = await _contactsFile();
+      if (await contactsFile.exists()) {
+        final map = jsonDecode(await contactsFile.readAsString()) as Map<String, dynamic>;
+        map.forEach((k, v) => _contacts[k] = v as String);
+      }
+    } catch (e) {
+      _logger.warning('Could not load comms contacts', e);
+    }
     try {
       final file = await _file();
       if (!await file.exists()) return;

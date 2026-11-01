@@ -58,6 +58,11 @@ class _CommsTabState extends State<CommsTab> with Refena {
       if (favorites.any((f) => f.fingerprint == device.fingerprint)) continue;
       favorites.add(FavoriteDevice.fromValues(fingerprint: device.fingerprint, ip: device.ip ?? '', port: device.port, alias: device.alias));
     }
+    // Everyone we have exchanged messages with stays listed even when they are out of range right now.
+    CommsMessageStore.instance.knownContacts.forEach((fingerprint, alias) {
+      if (fingerprint == myFingerprint || favorites.any((f) => f.fingerprint == fingerprint)) return;
+      favorites.add(FavoriteDevice.fromValues(fingerprint: fingerprint, ip: '', port: 53317, alias: alias));
+    });
 
     if (favorites.isEmpty) {
       return Center(

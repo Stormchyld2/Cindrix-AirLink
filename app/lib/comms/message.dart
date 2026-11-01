@@ -72,9 +72,10 @@ class CommsMessage {
   /// The wire form sent to the other phone's comms server: everything except our own local [status]/[read],
   /// which are never meaningful to the recipient, plus `from`, our fingerprint, which [contactFingerprint]
   /// is not (that field always names the *other* side, so it can't double as the sender id on the wire).
-  Map<String, dynamic> toWire(String myFingerprint) => {
+  Map<String, dynamic> toWire(String myFingerprint, {String myAlias = ''}) => {
     'id': id,
     'from': myFingerprint,
+    'fromAlias': myAlias,
     'type': type.name,
     'body': body,
     'createdAt': createdAt.toIso8601String(),

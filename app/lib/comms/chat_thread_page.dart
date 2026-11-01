@@ -51,6 +51,7 @@ class _ChatThreadPageState extends State<ChatThreadPage> with Refena {
     setState(() => _sending = true);
     _controller.clear();
 
+    await CommsMessageStore.instance.rememberContact(widget.favorite.fingerprint, widget.favorite.alias);
     await CommsMessageStore.instance.queueText(contactFingerprint: widget.favorite.fingerprint, text: text);
 
     // Try to deliver right now. First straight to the phone if discovery already sees it (same network, or
@@ -63,7 +64,18 @@ class _ChatThreadPageState extends State<ChatThreadPage> with Refena {
     }
     if (mounted && CommsMessageStore.instance.pendingOutboundFor(fingerprint).isNotEmpty) {
       if (await LinkStore.find(fingerprint) != null) {
-        if (mounted) await quickConnect(context, ref, widget.favorite);
+        if (mounted) {
+          final device = await quickConnect(context, ref, widget.favorite);
+          if (device != null) {
+            // Mail only: once it has gone through, drop our client link so this phone goes back to hosting its own
+            // group (Ready mode). Otherwise the link would sit "busy" for 10 minutes and the other phone could not
+            // reach us. Never cut a link that a file transfer is using.
+            for (var i = 0; i < 20 && CommsMessageStore.instance.pendingOutboundFor(fingerprint).isNotEmpty; i++) {
+              await Future<void>.delayed(const Duration(milliseconds: 500));
+            }
+            if (!LinkWatcher.transferBusy) await LinkWatcher.end();
+          }
+        }
       } else if (mounted) {
         context.showSnackBar('Queued. ${widget.favorite.alias} is not reachable right now and has no saved direct link; it will send when they appear.');
       }
@@ -80,6 +92,22 @@ class _ChatThreadPageState extends State<ChatThreadPage> with Refena {
       appBar: AppBar(title: Text(widget.favorite.alias)),
       body: Column(
         children: [
+          FutureBuilder<(String, String)?>(
+            future: LinkStore.find(widget.favorite.fingerprint),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState != ConnectionState.done || snapshot.data != null) return const SizedBox.shrink();
+              return Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(10),
+                color: Theme.of(context).colorScheme.secondaryContainer,
+                child: const Text(
+                  'Not paired. Messages only go through while this phone is visible on your network. Pair it once '
+                  '(Receive tab, "Pair a device") so it can reconnect by itself with no Wi-Fi.',
+                  style: TextStyle(fontSize: 12),
+                ),
+              );
+            },
+          ),
           Expanded(
             child: messages.isEmpty
                 ? const Center(child: Text('No messages yet. Send one — it delivers the next time you two are linked.'))
